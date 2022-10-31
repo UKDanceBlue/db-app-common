@@ -1,4 +1,6 @@
-export interface FirestoreNotification {
+import { FirestoreDocumentData } from "../shims/Firestore";
+
+export interface FirestoreNotification extends FirestoreDocumentData {
   body: string;
   sendTime: string;
   sound?: string;
