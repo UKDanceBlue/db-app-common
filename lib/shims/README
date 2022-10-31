@@ -1,0 +1,1 @@
+These types should not be used externally and are just a way of abstracting the different APIs used on different platforms
