@@ -1,5 +1,4 @@
 import { FirestoreNotification } from "./FirestoreNotification";
-import { isDocumentReference } from "./firebaseTypes";
 import { FirestoreDocumentData, FirestoreDocumentReference } from "../shims/Firestore";
 
 export interface FirestoreUserJson {
@@ -88,45 +87,34 @@ export class FirestoreUser {
     return returnVal;
   }
 
-  static isUserJson(documentData?: FirestoreDocumentData): documentData is FirestoreUserJson {
+  static isUserJson(documentData: unknown, documentReference: Function): documentData is FirestoreUserJson {
     if (documentData == null) {
       return false;
     }
 
-    // Check that all required fields are present
-    if (documentData.attributes == null) {
-      documentData.attributes = {};
-    }
-    if (documentData.email == null) {
-      return false;
-    }
-    if (documentData.firstName == null) {
-      return false;
-    }
-    if (documentData.lastName == null) {
-      return false;
-    }
+    const {
+      attributes, email, firstName, lastName, linkblue, team, notificationReferences
+    } = documentData as Partial<FirestoreUserJson>;
 
-    if (typeof documentData.attributes !== "object") {
+    if (attributes == null || typeof attributes !== "object") {
       return false;
     }
-    if (typeof documentData.email !== "string") {
+    if (email == null || typeof email !== "string") {
       return false;
     }
-    if (typeof documentData.firstName !== "string") {
+    if (firstName == null || typeof firstName !== "string") {
       return false;
     }
-    if (typeof documentData.lastName !== "string") {
+    if (lastName == null || typeof lastName !== "string") {
       return false;
     }
-
-    if (documentData.linkblue != null && typeof documentData.linkblue !== "string") {
+    if (linkblue != null && typeof linkblue !== "string") {
       return false;
     }
-    if (documentData.team != null && !(isDocumentReference(documentData.team))) {
+    if (team != null && !(team instanceof documentReference)) {
       return false;
     }
-    if (documentData.pastNotifications != null && (!Array.isArray(documentData.pastNotifications) || documentData.pastNotifications.some((x) => !(isDocumentReference(x))))) {
+    if (notificationReferences != null && (!Array.isArray(notificationReferences) || notificationReferences.some((x) => !(x instanceof documentReference)))) {
       return false;
     }
 
