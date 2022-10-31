@@ -2,6 +2,10 @@
   "name": "@ukdanceblue/db-app-common",
   "version": "1.0.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UKDanceBlue/db-app-common.git"
+  },
   "main": "dist/index.js",
   "files": [
     "dist"
