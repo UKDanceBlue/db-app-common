@@ -11,7 +11,7 @@ export * from "./NotificationPayload";
 export * from "./SpiritTeamsRootDoc";
 
 export interface FirestoreMetadata {
-  schemaVersion: number;
-  createdAt: FirestoreTimestamp;
-  modifiedAt: FirestoreTimestamp;
+  schemaVersion?: number;
+  createdAt?: FirestoreTimestamp;
+  modifiedAt?: FirestoreTimestamp;
 }

@@ -1,4 +1,6 @@
-export interface FirestoreDocumentData extends Function {
+import { Constructor } from "../util/Class";
+
+export interface FirestoreDocumentData {
   [key: string]: any;
 }
 
@@ -7,12 +9,9 @@ export interface FirestoreDocumentReference<T extends FirestoreDocumentData = an
   path: unknown;
 }
 
-export interface FirestoreTimestamp extends Function {
+interface BaseTimestamp {
   nanoseconds: number;
   seconds: number;
-  now(): FirestoreTimestamp;
-  fromDate(date: Date): FirestoreTimestamp;
-  fromMillis(milliseconds: number): FirestoreTimestamp;
-  toDate(): Date;
-  toMillis(): number;
 }
+
+export type FirestoreTimestamp = Constructor<BaseTimestamp>;

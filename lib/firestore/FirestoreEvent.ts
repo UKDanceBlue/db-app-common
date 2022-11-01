@@ -1,5 +1,7 @@
-import { FirestoreMetadata, FirestoreImageJson } from ".";
+import { FirestoreImageJson } from ".";
+import { FromJson, hasFirestoreMetadata, IsValidJson, MaybeWithFirestoreMetadata } from "./internal";
 import { FirestoreTimestamp } from "../shims/Firestore";
+import { RecursivePartial } from "../util";
 
 export interface FirestoreEventInterval {
   start: FirestoreTimestamp;
@@ -12,7 +14,6 @@ export interface FirestoreEventLink {
 }
 
 export interface FirestoreEventJson {
-  __meta?: FirestoreMetadata;
   name: string;
   shortDescription: string;
   description: string;
@@ -55,7 +56,7 @@ export class FirestoreEvent {
     this.highlightedLinks = highlightedLinks;
   }
 
-  static fromJson(json: FirestoreEventJson): FirestoreEvent {
+  static fromJson: FromJson<FirestoreEventJson> = (json) => {
     const schemaVersion = json.__meta?.schemaVersion ?? 0;
 
     switch (schemaVersion) {
@@ -139,7 +140,7 @@ export class FirestoreEvent {
     }
   }
 
-  toJson(now: FirestoreTimestamp): FirestoreEventJson {
+  toJson(): FirestoreEventJson {
     return {
       name: this.name,
       shortDescription: this.shortDescription,
@@ -153,7 +154,7 @@ export class FirestoreEvent {
   }
 
   // Like the method for FirestoreUser.ts
-  static isEventJson(json: unknown): json is FirestoreEventJson {
+  static isValidJson: IsValidJson<FirestoreEventJson> = (json): json is FirestoreEventJson => {
     if (typeof json !== "object" || json === null) {
       return false;
     }
@@ -168,7 +169,7 @@ export class FirestoreEvent {
       address,
       images,
       highlightedLinks,
-    } = json as unknown as FirestoreEventJson;
+    } = json as RecursivePartial<MaybeWithFirestoreMetadata<FirestoreEventJson>>;
 
     if (!name || typeof name !== "string") {
       return false;

@@ -1,10 +1,12 @@
-export interface FirestoreImageJson {
+import { FirestoreDocumentJson, FromJson, FirestoreDocumentModelInstance, IsValidJson } from "./internal";
+
+export interface FirestoreImageJson extends FirestoreDocumentJson {
   uri: `gs://${string}` | `http${"s" | ""}://${string}`;
   width: number;
   height: number;
 }
 
-export class FirestoreImage {
+export class FirestoreImage implements FirestoreDocumentModelInstance<FirestoreImageJson> {
   uri: `gs://${string}` | `http${"s" | ""}://${string}`;
   width: number;
   height: number;
@@ -15,10 +17,6 @@ export class FirestoreImage {
     this.height = height;
   }
 
-  static fromJson(json: FirestoreImageJson): FirestoreImage {
-    return new FirestoreImage(json.uri, json.width, json.height);
-  }
-
   toJson(): FirestoreImageJson {
     return {
       uri: this.uri,
@@ -27,7 +25,11 @@ export class FirestoreImage {
     };
   }
 
-  static isFirestoreImageJson(image?: unknown): image is FirestoreImage {
+  static fromJson: FromJson<FirestoreImageJson> = (json): FirestoreImage => {
+    return new FirestoreImage(json.uri, json.width, json.height);
+  }
+
+  static isValidJson: IsValidJson<FirestoreImageJson> = (image): image is FirestoreImageJson => {
     if (image == null) {
       return false;
     }
@@ -65,7 +67,7 @@ export class FirestoreImage {
 
     return true;
   }
-}
+};
 
 
 export interface DownloadableImageJson {
@@ -90,10 +92,6 @@ export class DownloadableImage {
     return new DownloadableImage(url, firestoreImage.width, firestoreImage.height);
   };
 
-  static fromJson(json: DownloadableImageJson): DownloadableImage {
-    return new DownloadableImage(json.url, json.width, json.height);
-  }
-
   toJson(): DownloadableImageJson {
     return {
       url: this.url,
@@ -102,7 +100,11 @@ export class DownloadableImage {
     };
   }
 
-  static isDownloadableImageJson(image?: unknown): image is DownloadableImage {
+  static fromJson: FromJson<DownloadableImageJson> = (json) => {
+    return new DownloadableImage(json.url, json.width, json.height);
+  }
+
+  static isValidJson: IsValidJson<DownloadableImageJson> = (image): image is DownloadableImageJson => {
     if (image == null) {
       return false;
     }
@@ -132,4 +134,4 @@ export class DownloadableImage {
 
     return true;
   }
-}
+};
