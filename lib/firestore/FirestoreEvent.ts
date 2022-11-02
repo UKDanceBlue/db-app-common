@@ -163,7 +163,7 @@ export class FirestoreEvent {
       interval: this.interval,
       intervals: this.intervals,
       address: this.address,
-      images: this.images,
+      images: this.images?.map((image) => image.toJson()),
       highlightedLinks: this.highlightedLinks,
     };
   }
