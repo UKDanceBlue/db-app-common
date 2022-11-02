@@ -1,4 +1,6 @@
-export interface SpiritTeamsRootDocJson {
+import { FirestoreDocumentJson } from "./internal.js";
+
+export interface SpiritTeamsRootDocJson extends FirestoreDocumentJson {
   basicInfo: {
     [teamId: string]: {
       name: string;

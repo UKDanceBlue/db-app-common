@@ -1,11 +1,12 @@
 import { FirestoreDocumentData } from "../shims/Firestore.js";
+import { FirestoreDocumentJson } from "./internal.js";
 
-export interface FirestoreNotification extends FirestoreDocumentData {
+export interface FirestoreNotification extends FirestoreDocumentJson {
   body: string;
   sendTime: string;
   sound?: string;
   title: string;
-  payload?: Record<string, unknown>;
+  payload?: FirestoreDocumentData
 }
 
 export function isFirestoreNotification(notification?: object): notification is FirestoreNotification {

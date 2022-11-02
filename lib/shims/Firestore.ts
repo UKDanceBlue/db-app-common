@@ -1,5 +1,7 @@
+export type AllowedFirestoreTypes = { [key: string]: AllowedFirestoreTypes } | AllowedFirestoreTypes[] | BasicGeopoint | BasicTimestamp | FirestoreDocumentReference | string | number | boolean | null;
+
 export interface FirestoreDocumentData {
-  [key: string]: any;
+  [key: string]: AllowedFirestoreTypes;
 }
 
 export interface FirestoreDocumentReference<T extends FirestoreDocumentData = any> extends Function {
@@ -12,4 +14,14 @@ export interface BasicTimestamp {
   seconds: number;
   toMillis(): number;
   toDate(): Date;
+  valueOf(): string;
+  toJSON(): { nanoseconds: number, seconds: number };
+  isEqual(other: BasicTimestamp): boolean;
+}
+
+export interface BasicGeopoint {
+  latitude: number;
+  longitude: number;
+  toJSON(): { latitude: number, longitude: number };
+  isEqual(other: BasicGeopoint): boolean;
 }

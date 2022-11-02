@@ -1,20 +1,20 @@
 import { FirestoreImageJson, FirestoreImage } from "./index.js";
-import { FromJson, hasFirestoreMetadata, IsValidJson, MaybeWithFirestoreMetadata, WhatIsWrongWithThisJson } from "./internal.js";
+import { FirestoreDocumentJson, FromJson, hasFirestoreMetadata, IsValidJson, WithFirestoreMetadata, WhatIsWrongWithThisJson } from "./internal.js";
 import { BasicTimestamp } from "../shims/Firestore.js";
 import { FormErrors } from "../util/formReducer.js";
 import { RecursivePartial } from "../util/index.js";
 
-export interface FirestoreEventInterval {
+export interface FirestoreEventInterval extends FirestoreDocumentJson {
   start: BasicTimestamp;
   end: BasicTimestamp;
 }
 
-export interface FirestoreEventLink {
+export interface FirestoreEventLink extends FirestoreDocumentJson {
   text: string;
   url: string;
 }
 
-export interface FirestoreEventJson {
+export interface FirestoreEventJson extends FirestoreDocumentJson {
   name: string;
   shortDescription: string;
   description: string;
@@ -50,11 +50,22 @@ export class FirestoreEvent {
     this.name = name;
     this.shortDescription = shortDescription;
     this.description = description;
-    this.interval = interval;
-    this.specificIntervals = intervals;
-    this.address = address;
-    this.images = images;
-    this.highlightedLinks = highlightedLinks;
+
+    if (intervals) {
+      this.specificIntervals = intervals;
+    }
+    if (interval) {
+      this.interval = interval;
+    }
+    if (address) {
+      this.address = address;
+    }
+    if (images) {
+      this.images = images;
+    }
+    if (highlightedLinks) {
+      this.highlightedLinks = highlightedLinks;
+    }
   }
 
   static fromJson: FromJson<FirestoreEventJson, FirestoreEvent> = (json, forceSchemaVersion) => {
@@ -140,8 +151,12 @@ export class FirestoreEvent {
         );
 
         if (hasFirestoreMetadata(json)) {
-          returnVal.createdAt = json.__meta.createdAt;
-          returnVal.modifiedAt = json.__meta.modifiedAt;
+          if (json.__meta.createdAt) {
+            returnVal.createdAt = json.__meta.createdAt;
+          }
+          if (json.__meta.modifiedAt) {
+            returnVal.modifiedAt = json.__meta.modifiedAt;
+          }
         }
 
         return returnVal;
@@ -152,20 +167,40 @@ export class FirestoreEvent {
     }
   }
 
-  toJson(): MaybeWithFirestoreMetadata<FirestoreEventJson> {
-    return {
+  toJson(): WithFirestoreMetadata<FirestoreEventJson> {
+    const returnVal: WithFirestoreMetadata<FirestoreEventJson> = {
       __meta: {
         schemaVersion: 1,
       },
       name: this.name,
       shortDescription: this.shortDescription,
       description: this.description,
-      interval: this.interval,
-      intervals: this.intervals,
-      address: this.address,
-      images: this.images?.map((image) => image.toJson()),
-      highlightedLinks: this.highlightedLinks,
     };
+
+    if (this.interval) {
+      returnVal.interval = this.interval;
+    }
+    if (this.specificIntervals) {
+      returnVal.intervals = this.specificIntervals;
+    }
+    if (this.address) {
+      returnVal.address = this.address;
+    }
+    if (this.images) {
+      returnVal.images = this.images.map(image => image.toJson());
+    }
+    if (this.highlightedLinks) {
+      returnVal.highlightedLinks = this.highlightedLinks;
+    }
+
+    if (this.createdAt) {
+      returnVal.__meta.createdAt = this.createdAt;
+    }
+    if (this.modifiedAt) {
+      returnVal.__meta.modifiedAt = this.modifiedAt;
+    }
+
+    return returnVal;
   }
 
   static whatIsWrongWithThisJson: WhatIsWrongWithThisJson<FirestoreEventJson> = (json) => {

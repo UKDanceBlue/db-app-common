@@ -1,4 +1,6 @@
-export interface FirestoreTeamJson {
+import { FirestoreDocumentJson } from "./internal.js";
+
+export interface FirestoreTeamJson extends FirestoreDocumentJson {
   name: string;
   teamClass?: "public" | "committee";
   members: string[];

@@ -1,3 +1,4 @@
+import { FirestoreDocumentData } from "../shims/Firestore.js";
 import { FirestoreDocumentJson, FromJson, FirestoreDocumentModelInstance, IsValidJson } from "./internal.js";
 
 export interface FirestoreImageJson extends FirestoreDocumentJson {
@@ -70,7 +71,7 @@ export class FirestoreImage implements FirestoreDocumentModelInstance<FirestoreI
 };
 
 
-export interface DownloadableImageJson {
+export interface DownloadableImageJson extends FirestoreDocumentData {
   url?: string;
   width: number;
   height: number;
@@ -82,7 +83,9 @@ export class DownloadableImage {
   height: number;
 
   constructor(url: DownloadableImage["url"], width: DownloadableImage["width"], height: DownloadableImage["height"]) {
-    this.url = url;
+    if (url != null) {
+      this.url = url;
+    }
     this.width = width;
     this.height = height;
   }
@@ -93,11 +96,16 @@ export class DownloadableImage {
   };
 
   toJson(): DownloadableImageJson {
-    return {
-      url: this.url,
+    const returnVal: DownloadableImageJson = {
       width: this.width,
       height: this.height,
     };
+
+    if (this.url != null) {
+      returnVal.url = this.url;
+    }
+
+    return returnVal;
   }
 
   static fromJson: FromJson<DownloadableImageJson, DownloadableImage> = (json) => {

@@ -1,6 +1,7 @@
 import { DownloadableImage, DownloadableImageJson, FirestoreImage, FirestoreImageJson } from "./FirestoreImage.js";
+import { FirestoreDocumentJson } from "./internal.js";
 
-export interface FirestoreSponsorJson {
+export interface FirestoreSponsorJson extends FirestoreDocumentJson {
   link?: string;
   logo?: FirestoreImageJson;
   name?: string;
@@ -12,9 +13,15 @@ export class FirestoreSponsor {
   name?: string;
 
   constructor(link?: string, logo?: FirestoreImage, name?: string) {
-    this.link = link;
-    this.logo = logo;
-    this.name = name;
+    if (link != null) {
+      this.link = link;
+    }
+    if (logo != null) {
+      this.logo = logo;
+    }
+    if (name != null) {
+      this.name = name;
+    }
   }
 
   static fromJson(json: FirestoreSponsorJson): FirestoreSponsor {
@@ -71,7 +78,7 @@ export class FirestoreSponsor {
   }
 }
 
-export interface DownloadableSponsorJson {
+export interface DownloadableSponsorJson extends FirestoreDocumentJson {
   name?: string;
   logo?: DownloadableImageJson;
   link?: string;
@@ -99,11 +106,19 @@ export class DownloadableSponsor {
   }
 
   toJson(): DownloadableSponsorJson {
-    return {
-      link: this.link,
-      logo: this.logo?.toJson(),
-      name: this.name,
-    };
+    const returnVal: DownloadableSponsorJson = {};
+
+    if (this.link != null) {
+      returnVal.link = this.link;
+    }
+    if (this.logo != null) {
+      returnVal.logo = this.logo.toJson();
+    }
+    if (this.name != null) {
+      returnVal.name = this.name;
+    }
+
+    return returnVal;
   }
 
   isDownloadableSponsorJson(sponsor?: unknown): sponsor is DownloadableSponsorJson {
