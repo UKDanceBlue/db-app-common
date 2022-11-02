@@ -57,8 +57,8 @@ export class FirestoreEvent {
     this.highlightedLinks = highlightedLinks;
   }
 
-  static fromJson: FromJson<FirestoreEventJson, FirestoreEvent> = (json) => {
-    const schemaVersion = hasFirestoreMetadata(json) ? json.__meta.schemaVersion ?? 0 : 0;
+  static fromJson: FromJson<FirestoreEventJson, FirestoreEvent> = (json, forceSchemaVersion) => {
+    const schemaVersion = forceSchemaVersion ?? (hasFirestoreMetadata(json) ? json.__meta.schemaVersion ?? 0 : 0);
 
     switch (schemaVersion) {
       case 0: {

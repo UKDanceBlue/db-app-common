@@ -24,7 +24,7 @@ export function removeFirestoreMetadata<T>(doc: WithFirestoreMetadata<T>): T {
   return temp as T;
 }
 
-export type FromJson<T extends MaybeWithFirestoreMetadata<FirestoreDocumentJson>, R extends FirestoreDocumentModelInstance<T>> = (json: T) => R;
+export type FromJson<T extends MaybeWithFirestoreMetadata<FirestoreDocumentJson>, R extends FirestoreDocumentModelInstance<T>> = (json: T, schemaVersion?: number) => R;
 export type WhatIsWrongWithThisJson<T extends MaybeWithFirestoreMetadata<FirestoreDocumentJson>> = (json?: unknown | T) => FormErrors<T> | null;
 export type IsValidJson<T extends MaybeWithFirestoreMetadata<FirestoreDocumentJson>> = (json?: unknown) => json is T;
 export interface FirestoreDocumentModel<T extends FirestoreDocumentJson, R extends FirestoreDocumentModelInstance<T>> {
