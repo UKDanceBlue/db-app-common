@@ -1,5 +1,5 @@
-import { FirestoreNotification } from "./FirestoreNotification";
-import { FirestoreDocumentData, FirestoreDocumentReference } from "../shims/Firestore";
+import { FirestoreNotification } from "./FirestoreNotification.js";
+import { FirestoreDocumentData, FirestoreDocumentReference } from "../shims/Firestore.js";
 
 export interface FirestoreUserJson {
   attributes: Record<string, string>;

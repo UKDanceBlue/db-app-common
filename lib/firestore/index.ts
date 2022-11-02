@@ -1,17 +1,17 @@
-import { FirestoreTimestamp } from "../shims/Firestore";
+import { BasicTimestamp } from "../shims/Firestore.js";
 
-export * from "./FirestoreUser";
-export * from "./FirestoreImage";
-export * from "./FirestoreSponsor";
-export * from "./FirestoreTeam";
-export * from "./FirestoreDevice";
-export * from "./FirestoreEvent";
-export * from "./FirestoreNotification";
-export * from "./NotificationPayload";
-export * from "./SpiritTeamsRootDoc";
+export * from "./FirestoreUser.js";
+export * from "./FirestoreImage.js";
+export * from "./FirestoreSponsor.js";
+export * from "./FirestoreTeam.js";
+export * from "./FirestoreDevice.js";
+export * from "./FirestoreEvent.js";
+export * from "./FirestoreNotification.js";
+export * from "./NotificationPayload.js";
+export * from "./SpiritTeamsRootDoc.js";
 
 export interface FirestoreMetadata {
   schemaVersion?: number;
-  createdAt?: FirestoreTimestamp;
-  modifiedAt?: FirestoreTimestamp;
+  createdAt?: BasicTimestamp;
+  modifiedAt?: BasicTimestamp;
 }

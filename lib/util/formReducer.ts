@@ -1,0 +1,39 @@
+import { useReducer, useState } from "react";
+
+export type UpdatePayload<T extends object, K extends keyof T = keyof T> = [K, T[K]];
+export type FormErrors<T extends object> = Partial<Record<keyof T | "%STRUCTURE%", boolean | string>>;
+
+export const useFormReducer = <T extends object>(initialState: T, validator?: (state: T) => FormErrors<T>) => {
+  const [errors, setErrors] = useState<FormErrors<T>>({});
+  const reducer = useReducer(
+    (state: T, newState: ["reset"] | ["update", UpdatePayload<T>] | ["set", T]) => {
+      switch (newState[0]) {
+        case "reset": {
+          return initialState;
+        }
+        case "update": {
+          const updatedState = {
+            ...state,
+            [newState[1][0]]: newState[1][1],
+          };
+          if (validator) {
+            setErrors(validator(updatedState));
+          }
+          return updatedState;
+        }
+        case "set": {
+          if (validator) {
+            setErrors(validator(newState[1]));
+          }
+          return newState[1];
+        }
+        default: {
+          throw new Error("Invalid action");
+        }
+      }
+    },
+    initialState
+  );
+
+  return [reducer, errors] as const;
+};

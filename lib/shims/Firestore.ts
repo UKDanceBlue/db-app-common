@@ -1,5 +1,3 @@
-import { Constructor } from "../util/Class";
-
 export interface FirestoreDocumentData {
   [key: string]: any;
 }
@@ -9,9 +7,9 @@ export interface FirestoreDocumentReference<T extends FirestoreDocumentData = an
   path: unknown;
 }
 
-interface BaseTimestamp {
+export interface BasicTimestamp {
   nanoseconds: number;
   seconds: number;
+  toMillis(): number;
+  toDate(): Date;
 }
-
-export type FirestoreTimestamp = Constructor<BaseTimestamp>;

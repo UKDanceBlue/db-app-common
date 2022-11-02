@@ -1,4 +1,4 @@
-import { FirestoreImage } from "./FirestoreImage";
+import { FirestoreImage } from "./FirestoreImage.js";
 
 export interface NotificationInfoPopup {
   title: string;

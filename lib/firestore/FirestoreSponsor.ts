@@ -1,4 +1,4 @@
-import { DownloadableImage, DownloadableImageJson, FirestoreImage, FirestoreImageJson } from "./FirestoreImage";
+import { DownloadableImage, DownloadableImageJson, FirestoreImage, FirestoreImageJson } from "./FirestoreImage.js";
 
 export interface FirestoreSponsorJson {
   link?: string;
@@ -60,7 +60,7 @@ export class FirestoreSponsor {
     if (link != null && typeof link !== "string") {
       return false;
     }
-    if (logo != null && !FirestoreImage.isFirestoreImageJson(logo)) {
+    if (logo != null && !FirestoreImage.isValidJson(logo)) {
       return false;
     }
     if (name != null && typeof name !== "string") {
@@ -119,7 +119,7 @@ export class DownloadableSponsor {
       return false;
     }
 
-    if (sponsorJson.logo != null && !DownloadableImage.isDownloadableImageJson(sponsorJson.logo)) {
+    if (sponsorJson.logo != null && !DownloadableImage.isValidJson(sponsorJson.logo)) {
       return false;
     }
 

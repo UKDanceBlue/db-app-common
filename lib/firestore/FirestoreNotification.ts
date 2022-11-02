@@ -1,4 +1,4 @@
-import { FirestoreDocumentData } from "../shims/Firestore";
+import { FirestoreDocumentData } from "../shims/Firestore.js";
 
 export interface FirestoreNotification extends FirestoreDocumentData {
   body: string;

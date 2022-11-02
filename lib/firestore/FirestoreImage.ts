@@ -1,4 +1,4 @@
-import { FirestoreDocumentJson, FromJson, FirestoreDocumentModelInstance, IsValidJson } from "./internal";
+import { FirestoreDocumentJson, FromJson, FirestoreDocumentModelInstance, IsValidJson } from "./internal.js";
 
 export interface FirestoreImageJson extends FirestoreDocumentJson {
   uri: `gs://${string}` | `http${"s" | ""}://${string}`;
@@ -25,7 +25,7 @@ export class FirestoreImage implements FirestoreDocumentModelInstance<FirestoreI
     };
   }
 
-  static fromJson: FromJson<FirestoreImageJson> = (json): FirestoreImage => {
+  static fromJson: FromJson<FirestoreImageJson, FirestoreImage> = (json): FirestoreImage => {
     return new FirestoreImage(json.uri, json.width, json.height);
   }
 
@@ -100,7 +100,7 @@ export class DownloadableImage {
     };
   }
 
-  static fromJson: FromJson<DownloadableImageJson> = (json) => {
+  static fromJson: FromJson<DownloadableImageJson, DownloadableImage> = (json) => {
     return new DownloadableImage(json.url, json.width, json.height);
   }
 
