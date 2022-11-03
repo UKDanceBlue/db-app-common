@@ -110,7 +110,6 @@ export class FirestoreEvent {
         } = json as unknown as LegacyEventType;
 
         if (startTime == null || endTime == null) {
-          alert(JSON.stringify(json));
           throw new Error("Event must have a start and end time");
         }
 
