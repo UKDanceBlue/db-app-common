@@ -1,12 +1,12 @@
+import { AllowedFirestoreTypes } from "../shims/Firestore.js";
 import { FirestoreImageJson } from "./FirestoreImage.js";
-import { FirestoreDocumentJson } from "./internal.js";
 
-export interface NotificationInfoPopup extends FirestoreDocumentJson {
+export interface NotificationInfoPopup extends Record<string, AllowedFirestoreTypes> {
   title: string;
   message: string;
   image?: FirestoreImageJson;
 }
 
-export interface NotificationPayload {
+export interface NotificationPayload extends Record<string, AllowedFirestoreTypes> {
   url: string;
 }

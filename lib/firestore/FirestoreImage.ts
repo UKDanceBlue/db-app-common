@@ -1,7 +1,7 @@
-import { FirestoreDocumentData } from "../shims/Firestore.js";
-import { FirestoreDocumentJson, FromJson, FirestoreDocumentModelInstance, IsValidJson } from "./internal.js";
+import { AllowedFirestoreTypes } from "../shims/Firestore.js";
+import { FromJson, FirestoreDocumentModelInstance, IsValidJson } from "./internal.js";
 
-export interface FirestoreImageJson extends FirestoreDocumentJson {
+export interface FirestoreImageJson extends Record<string, AllowedFirestoreTypes> {
   uri: `gs://${string}` | `http${"s" | ""}://${string}`;
   width: number;
   height: number;
@@ -71,7 +71,7 @@ export class FirestoreImage implements FirestoreDocumentModelInstance<FirestoreI
 };
 
 
-export interface DownloadableImageJson extends FirestoreDocumentData {
+export interface DownloadableImageJson extends Record<string, AllowedFirestoreTypes> {
   url?: string;
   width: number;
   height: number;

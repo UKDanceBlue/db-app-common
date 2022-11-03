@@ -1,15 +1,15 @@
 import { FirestoreImageJson, FirestoreImage } from "./index.js";
 import { FirestoreDocumentJson, FromJson, hasFirestoreMetadata, IsValidJson, WithFirestoreMetadata, WhatIsWrongWithThisJson } from "./internal.js";
-import { BasicTimestamp } from "../shims/Firestore.js";
+import { BasicTimestamp, AllowedFirestoreTypes } from "../shims/Firestore.js";
 import { FormErrors } from "../util/formReducer.js";
 import { RecursivePartial } from "../util/index.js";
 
-export interface FirestoreEventInterval extends FirestoreDocumentJson {
+export interface FirestoreEventInterval extends Record<string, AllowedFirestoreTypes>{
   start: BasicTimestamp;
   end: BasicTimestamp;
 }
 
-export interface FirestoreEventLink extends FirestoreDocumentJson {
+export interface FirestoreEventLink extends Record<string, AllowedFirestoreTypes> {
   text: string;
   url: string;
 }

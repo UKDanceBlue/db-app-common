@@ -1,5 +1,5 @@
 import { FirestoreNotification } from "./FirestoreNotification.js";
-import { FirestoreDocumentData, FirestoreDocumentReference } from "../shims/Firestore.js";
+import { AllowedFirestoreTypes, FirestoreDocumentReference } from "../shims/Firestore.js";
 import { FirestoreDocumentJson } from "./internal.js";
 
 export interface FirestoreUserJson extends FirestoreDocumentJson {

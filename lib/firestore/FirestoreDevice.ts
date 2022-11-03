@@ -1,4 +1,6 @@
-export interface FirestoreDeviceJson {
+import { FirestoreDocumentJson } from "./internal";
+
+export interface FirestoreDeviceJson extends FirestoreDocumentJson {
   audiences?: string[] | null;
   expoPushToken?: string | null;
   latestUserId?: string | null;

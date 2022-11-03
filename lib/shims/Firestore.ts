@@ -1,10 +1,6 @@
 export type AllowedFirestoreTypes = { [key: string]: AllowedFirestoreTypes } | AllowedFirestoreTypes[] | BasicGeopoint | BasicTimestamp | FirestoreDocumentReference | string | number | boolean | null;
 
-export interface FirestoreDocumentData {
-  [key: string]: AllowedFirestoreTypes;
-}
-
-export interface FirestoreDocumentReference<T extends FirestoreDocumentData = any> extends Function {
+export interface FirestoreDocumentReference<T extends Record<string, AllowedFirestoreTypes> = any> extends Function {
   id: unknown;
   path: unknown;
 }
