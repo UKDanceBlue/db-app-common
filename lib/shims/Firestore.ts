@@ -1,6 +1,8 @@
+import { FirestoreDocumentJson } from "../firestore/internal";
+
 export type AllowedFirestoreTypes = { [key: string]: AllowedFirestoreTypes } | AllowedFirestoreTypes[] | BasicGeopoint | BasicTimestamp | FirestoreDocumentReference | string | number | boolean | null;
 
-export interface FirestoreDocumentReference<T extends Record<string, AllowedFirestoreTypes> = any> extends Function {
+export interface FirestoreDocumentReference<T extends FirestoreDocumentJson = FirestoreDocumentJson> extends Function {
   id: unknown;
   path: unknown;
 }

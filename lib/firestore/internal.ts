@@ -2,7 +2,7 @@ import { AllowedFirestoreTypes } from "../shims/Firestore.js";
 import { FormErrors } from "../util/formReducer.js";
 import { FirestoreMetadata } from "./index.js";
 
-export interface FirestoreDocumentJson extends Record<string, AllowedFirestoreTypes> { }
+export interface FirestoreDocumentJson { }
 export interface FirestoreDocumentModelInstance<T extends FirestoreDocumentJson> {
   toJson(): T;
 }
