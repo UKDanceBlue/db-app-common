@@ -1,5 +1,5 @@
 import { BasicTimestamp, isTimestampLike } from "../shims/Firestore";
-import { FirestoreDocumentJson, IsValidJson, MaybeWithFirestoreMetadata } from "./internal";
+import { FirestoreDocumentJson, IsValidJson, MaybeWithFirestoreMetadata, FromJson } from "./internal";
 
 export interface FirestoreSpiritOpportunityInfoJson extends FirestoreDocumentJson {
   name: string;
@@ -18,8 +18,12 @@ export class FirestoreSpiritOpportunityInfo {
     this.totalPoints = totalPoints;
   }
 
-  static fromJson(json: FirestoreSpiritOpportunityInfoJson): FirestoreSpiritOpportunityInfo {
-    return new FirestoreSpiritOpportunityInfo(json.name, json.date, json.totalPoints);
+  static fromJson: FromJson<FirestoreSpiritOpportunityInfoJson, FirestoreSpiritOpportunityInfo> = (json: FirestoreSpiritOpportunityInfoJson): FirestoreSpiritOpportunityInfo => {
+    return new FirestoreSpiritOpportunityInfo(
+      json.name,
+      json.date,
+      json.totalPoints,
+    );
   }
 
   toJson(): FirestoreSpiritOpportunityInfoJson {

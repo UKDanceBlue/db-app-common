@@ -10,6 +10,7 @@ export * from "./FirestoreNotification.js";
 export * from "./NotificationPayload.js";
 export * from "./SpiritTeamsRootDoc.js";
 export * from './FirestoreSpiritOpportunityInfo.js'
+export * from './FirestoreSpiritPointEntry.js'
 
 export interface FirestoreMetadata<Version extends number = number> extends Record<string, AllowedFirestoreTypes> {
   schemaVersion?: Version;
