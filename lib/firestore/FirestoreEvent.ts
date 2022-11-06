@@ -1,6 +1,6 @@
-import { FirestoreImageJson, FirestoreImage } from "./index.js";
+import { FirestoreImageJsonV1, FirestoreImage } from "./index.js";
 import { FirestoreDocumentJson, FromJson, hasFirestoreMetadata, IsValidJson, WithFirestoreMetadata, WhatIsWrongWithThisJson } from "./internal.js";
-import { BasicTimestamp, AllowedFirestoreTypes } from "../shims/Firestore.js";
+import { BasicTimestamp, AllowedFirestoreTypes, isTimestampLike } from "../shims/Firestore.js";
 import { FormErrors } from "../util/formReducer.js";
 import { RecursivePartial } from "../util/index.js";
 
@@ -8,22 +8,87 @@ export interface FirestoreEventInterval extends Record<string, AllowedFirestoreT
   start: BasicTimestamp;
   end: BasicTimestamp;
 }
+function isFirestoreEventIntervalLike(json: unknown): json is FirestoreEventInterval {
+  if (json == null) {
+    return false;
+  }
+
+  const {
+    start, end
+  } = json as Partial<FirestoreEventInterval>;
+
+  if (start == null || !isTimestampLike(start)) {
+    return false;
+  }
+
+  if (end == null || !isTimestampLike(end)) {
+    return false;
+  }
+
+  return true;
+}
 
 export interface FirestoreEventLink extends Record<string, AllowedFirestoreTypes> {
   text: string;
   url: string;
 }
+function isFirestoreEventLink(json: unknown): json is FirestoreEventLink {
+  if (json == null) {
+    return false;
+  }
 
-export interface FirestoreEventJson extends FirestoreDocumentJson {
+  const {
+    text, url
+  } = json as Partial<FirestoreEventLink>;
+
+  if (text == null || typeof text !== "string") {
+    return false;
+  }
+
+  if (url == null || typeof url !== "string") {
+    return false;
+  }
+  
+  return true;
+}
+
+export interface FirestoreEventJsonV0 extends FirestoreDocumentJson {
+  title: string;
+  shortDescription?: string;
+  description: string;
+  image?: {
+    uri: `gs://${string}` | `http${"s" | ""}://${string}`;
+    width: number;
+    height: number;
+  } | {
+    uri: `gs://${string}` | `http${"s" | ""}://${string}`;
+    width: number;
+    height: number;
+  }[];
+  address?: string;
+  startTime?: BasicTimestamp;
+  endTime?: BasicTimestamp;
+  link?: {
+    text: string;
+    url: string;
+  } | {
+    text: string;
+    url: string;
+  }[];
+}
+
+export interface FirestoreEventJsonV1 extends FirestoreDocumentJson {
   name: string;
   shortDescription: string;
   description: string;
   interval?: FirestoreEventInterval;
   intervals?: FirestoreEventInterval[];
   address?: string;
-  images?: FirestoreImageJson[];
+  images?: FirestoreImageJsonV1[];
   highlightedLinks?: FirestoreEventLink[];
 }
+
+export interface FirestoreEventJson extends FirestoreEventJsonV1 {};
 
 export class FirestoreEvent {
   private createdAt?: BasicTimestamp;
@@ -68,36 +133,11 @@ export class FirestoreEvent {
     }
   }
 
-  static fromJson: FromJson<FirestoreEventJson, FirestoreEvent> = (json, forceSchemaVersion) => {
+  static fromJson: FromJson<FirestoreEventJsonV0 | FirestoreEventJsonV1, FirestoreEvent> = (json, forceSchemaVersion) => {
     const schemaVersion = forceSchemaVersion ?? (hasFirestoreMetadata(json) ? json.__meta.schemaVersion ?? 0 : 0);
 
     switch (schemaVersion) {
       case 0: {
-        interface LegacyEventType {
-          title: string;
-          shortDescription?: string;
-          description: string;
-          image?: {
-            uri: `gs://${string}` | `http${"s" | ""}://${string}`;
-            width: number;
-            height: number;
-          } | {
-            uri: `gs://${string}` | `http${"s" | ""}://${string}`;
-            width: number;
-            height: number;
-          }[];
-          address?: string;
-          startTime?: BasicTimestamp;
-          endTime?: BasicTimestamp;
-          link?: {
-            text: string;
-            url: string;
-          } | {
-            text: string;
-            url: string;
-          }[];
-        }
-
         const {
           title,
           shortDescription,
@@ -107,7 +147,7 @@ export class FirestoreEvent {
           startTime,
           endTime,
           link,
-        } = json as unknown as LegacyEventType;
+        } = json as unknown as FirestoreEventJsonV0;
 
         if (startTime == null || endTime == null) {
           throw new Error("Event must have a start and end time");
@@ -139,14 +179,14 @@ export class FirestoreEvent {
       }
       case 1: {
         const returnVal = new FirestoreEvent(
-          json.name,
-          json.shortDescription,
-          json.description,
-          json.interval,
-          json.intervals,
-          json.address,
-          json.images?.map(FirestoreImage.fromJson),
-          json.highlightedLinks
+          (json as FirestoreEventJsonV1).name,
+          (json as FirestoreEventJsonV1).shortDescription,
+          (json as FirestoreEventJsonV1).description,
+          (json as FirestoreEventJsonV1).interval,
+          (json as FirestoreEventJsonV1).intervals,
+          (json as FirestoreEventJsonV1).address,
+          (json as FirestoreEventJsonV1).images?.map(FirestoreImage.fromJson),
+          (json as FirestoreEventJsonV1).highlightedLinks
         );
 
         if (hasFirestoreMetadata(json)) {
@@ -166,8 +206,8 @@ export class FirestoreEvent {
     }
   }
 
-  toJson(): WithFirestoreMetadata<FirestoreEventJson> {
-    const returnVal: WithFirestoreMetadata<FirestoreEventJson> = {
+  toJson(): WithFirestoreMetadata<FirestoreEventJsonV1, 1> {
+    const returnVal: WithFirestoreMetadata<FirestoreEventJsonV1, 1> = {
       __meta: {
         schemaVersion: 1,
       },
@@ -210,7 +250,6 @@ export class FirestoreEvent {
 
     switch (schemaVersion) {
       case 0: {
-        console.warn("Legacy schema version detected for FirestoreEvent, no validation will be performed");
         break;
       }
       case 1: {
@@ -322,8 +361,50 @@ export class FirestoreEvent {
     return isSomethingWrong ? errors : null;
   }
 
-  static isValidJson: IsValidJson<FirestoreEventJson> = (json): json is FirestoreEventJson => {
-    return !FirestoreEvent.whatIsWrongWithThisJson(json);
+  static isValidJson: IsValidJson<FirestoreEventJsonV1> = (json): json is FirestoreEventJsonV1 => {
+    if (json == null) {
+      return false;
+    }
+
+    if (typeof json !== "object") {
+      return false;
+    }
+
+    const { name, shortDescription, description, interval, intervals, address, images, highlightedLinks } = json as RecursivePartial<FirestoreEventJsonV1>;
+
+    if (typeof name !== "string") {
+      return false;
+    }
+
+    if (typeof shortDescription !== "string") {
+      return false;
+    }
+
+    if (typeof description !== "string") {
+      return false;
+    }
+
+    if (interval != null && !isFirestoreEventIntervalLike(interval)) {
+      return false;
+    }
+     
+    if (intervals != null && !Array.isArray(intervals)) {
+      return false;
+    }
+
+    if (address != null && typeof address !== "string") {
+      return false;
+    }
+
+    if (images != null && !Array.isArray(images)) {
+      return false;
+    }
+
+    if (highlightedLinks != null && !Array.isArray(highlightedLinks)) {
+      return false;
+    }
+
+    return true;
   }
 
   get createdAtDate(): BasicTimestamp | undefined {

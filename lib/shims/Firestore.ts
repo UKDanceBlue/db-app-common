@@ -15,9 +15,23 @@ export interface BasicTimestamp {
   isEqual(other: BasicTimestamp): boolean;
 }
 
+/**
+ * Avoid using this unless the type is almost certainly a Timestamp.
+ */
+export function isTimestampLike(value: unknown): value is BasicTimestamp {
+  return typeof value === "object" && value != null && "nanoseconds" in value && "seconds" in value;
+}
+
 export interface BasicGeopoint {
   latitude: number;
   longitude: number;
   toJSON(): { latitude: number, longitude: number };
   isEqual(other: BasicGeopoint): boolean;
+}
+
+/**
+ * Avoid using this unless the type is almost certainly a Geopoint.
+ */
+export function isGeopointLike(value: unknown): value is BasicGeopoint {
+  return typeof value === "object" && value != null && "latitude" in value && "longitude" in value;
 }

@@ -1,13 +1,13 @@
 import { AllowedFirestoreTypes } from "../shims/Firestore.js";
 import { FromJson, FirestoreDocumentModelInstance, IsValidJson } from "./internal.js";
 
-export interface FirestoreImageJson extends Record<string, AllowedFirestoreTypes> {
+export interface FirestoreImageJsonV1 extends Record<string, AllowedFirestoreTypes> {
   uri: `gs://${string}` | `http${"s" | ""}://${string}`;
   width: number;
   height: number;
 }
 
-export class FirestoreImage implements FirestoreDocumentModelInstance<FirestoreImageJson> {
+export class FirestoreImage implements FirestoreDocumentModelInstance<FirestoreImageJsonV1> {
   uri: `gs://${string}` | `http${"s" | ""}://${string}`;
   width: number;
   height: number;
@@ -18,7 +18,7 @@ export class FirestoreImage implements FirestoreDocumentModelInstance<FirestoreI
     this.height = height;
   }
 
-  toJson(): FirestoreImageJson {
+  toJson(): FirestoreImageJsonV1 {
     return {
       uri: this.uri,
       width: this.width,
@@ -26,11 +26,11 @@ export class FirestoreImage implements FirestoreDocumentModelInstance<FirestoreI
     };
   }
 
-  static fromJson: FromJson<FirestoreImageJson, FirestoreImage> = (json): FirestoreImage => {
+  static fromJson: FromJson<FirestoreImageJsonV1, FirestoreImage> = (json): FirestoreImage => {
     return new FirestoreImage(json.uri, json.width, json.height);
   }
 
-  static isValidJson: IsValidJson<FirestoreImageJson> = (image): image is FirestoreImageJson => {
+  static isValidJson: IsValidJson<FirestoreImageJsonV1> = (image): image is FirestoreImageJsonV1 => {
     if (image == null) {
       return false;
     }

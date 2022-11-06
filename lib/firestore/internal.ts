@@ -7,7 +7,7 @@ export interface FirestoreDocumentModelInstance<T extends FirestoreDocumentJson>
   toJson(): T;
 }
 
-export type WithFirestoreMetadata<T> = T & { __meta: FirestoreMetadata; };
+export type WithFirestoreMetadata<T, Version extends number = number> = T & { __meta: FirestoreMetadata<Version>; };
 export type MaybeWithFirestoreMetadata<T> = T | WithFirestoreMetadata<T>;
 export function hasFirestoreMetadata<T>(doc: MaybeWithFirestoreMetadata<T>): doc is WithFirestoreMetadata<T> {
   return (doc as WithFirestoreMetadata<T>).__meta != null;
