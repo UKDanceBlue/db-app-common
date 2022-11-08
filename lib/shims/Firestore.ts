@@ -1,4 +1,4 @@
-import { FirestoreDocumentJson } from "../firestore/internal";
+import { FirestoreDocumentJson } from "../firestore/internal.js";
 
 export type AllowedFirestoreTypes = { [key: string]: AllowedFirestoreTypes } | AllowedFirestoreTypes[] | BasicGeopoint | BasicTimestamp | FirestoreDocumentReference | string | number | boolean | null;
 

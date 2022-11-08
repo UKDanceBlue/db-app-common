@@ -1,5 +1,5 @@
-import { BasicTimestamp, isTimestampLike } from "../shims/Firestore";
-import { FirestoreDocumentJson, IsValidJson, MaybeWithFirestoreMetadata, FromJson } from "./internal";
+import { BasicTimestamp, isTimestampLike } from "../shims/Firestore.js";
+import { FirestoreDocumentJson, IsValidJson, MaybeWithFirestoreMetadata, FromJson } from "./internal.js";
 
 export interface FirestoreSpiritOpportunityInfoJson extends FirestoreDocumentJson {
   name: string;
