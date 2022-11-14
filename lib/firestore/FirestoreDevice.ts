@@ -1,4 +1,4 @@
-import { FirestoreDocumentJson } from "./internal";
+import { FirestoreDocumentJson } from "./internal.js";
 
 export interface FirestoreDeviceJson extends FirestoreDocumentJson {
   audiences?: string[] | null;
