@@ -2,9 +2,17 @@ import { FirestoreDocumentJson } from "../firestore/internal";
 
 export type AllowedFirestoreTypes = { [key: string]: AllowedFirestoreTypes } | AllowedFirestoreTypes[] | BasicGeopoint | BasicTimestamp | FirestoreDocumentReference | string | number | boolean | null;
 
-export interface FirestoreDocumentReference<T extends FirestoreDocumentJson = FirestoreDocumentJson> extends Function {
-  id: unknown;
-  path: unknown;
+export interface FirestoreDocumentReference<T extends FirestoreDocumentJson = FirestoreDocumentJson> {
+  id: string;
+  path: string;
+}
+
+export interface FirestoreDocumentSnapshot<T extends FirestoreDocumentJson = FirestoreDocumentJson> {
+  id: string;
+  ref: FirestoreDocumentReference<T>;
+  exists: boolean | (() => boolean);
+  // We use unknown here just in case the data is invalid
+  data: () => unknown | undefined;
 }
 
 export interface BasicTimestamp {

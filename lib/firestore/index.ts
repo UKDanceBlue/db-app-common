@@ -14,6 +14,8 @@ export * from './FirestoreSpiritPointEntry.js'
 
 export interface FirestoreMetadata<Version extends number = number> extends Record<string, AllowedFirestoreTypes> {
   schemaVersion?: Version;
+  documentId?: string;
+  documentPath?: string;
   createdAt?: BasicTimestamp;
   modifiedAt?: BasicTimestamp;
 }

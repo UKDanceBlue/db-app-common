@@ -1,5 +1,5 @@
-import { FirestoreImageJsonV1, FirestoreImage } from "./index.js";
-import { FirestoreDocumentJson, FromJson, hasFirestoreMetadata, IsValidJson, WithFirestoreMetadata, WhatIsWrongWithThisJson } from "./internal.js";
+import { FirestoreImageJsonV1, FirestoreImage, FirestoreMetadata } from "./index.js";
+import { FirestoreDocumentJson, FromJson, hasFirestoreMetadata, IsValidJson, WithFirestoreMetadata, WhatIsWrongWithThisJson, FromSnapshot, MaybeWithFirestoreMetadata } from "./internal.js";
 import { BasicTimestamp, AllowedFirestoreTypes, isTimestampLike } from "../shims/Firestore.js";
 import { FormErrors } from "../util/formReducer.js";
 import { RecursivePartial } from "../util/index.js";
@@ -89,10 +89,10 @@ export interface FirestoreEventJsonV1 extends FirestoreDocumentJson {
 }
 
 export interface FirestoreEventJson extends FirestoreEventJsonV1 {};
+export type UnVersionedFirestoreEventJson = FirestoreEventJsonV0 | FirestoreEventJsonV1;
 
 export class FirestoreEvent {
-  private createdAt?: BasicTimestamp;
-  private modifiedAt?: BasicTimestamp;
+  documentMetadata?: FirestoreMetadata;
   name: string;
   shortDescription: string;
   description: string;
@@ -133,49 +133,32 @@ export class FirestoreEvent {
     }
   }
 
-  static fromJson: FromJson<FirestoreEventJsonV0 | FirestoreEventJsonV1, FirestoreEvent> = (json, forceSchemaVersion) => {
+  static fromSnapshot: FromSnapshot<UnVersionedFirestoreEventJson, FirestoreEvent> = (snapshot) => {
+    const json = snapshot.data() as MaybeWithFirestoreMetadata<unknown>
+    
+    if (hasFirestoreMetadata(json) && json.__meta.schemaVersion != null) {
+      if (FirestoreEvent.isValidJson(json)) {
+        return FirestoreEvent.fromJson(json, {documentId: snapshot.id, schemaVersion: json.__meta.schemaVersion});
+      } else {
+        throw new Error("Unknown schema version for FirestoreEvent");
+      }
+    } else {
+      // Try the default version
+      if (FirestoreEvent.isValidJson(json)) {
+        return FirestoreEvent.fromJson(json, {documentId: snapshot.id});
+      } else {
+        throw new Error("No schemaVersion found in document metadata and ");
+      }
+    }
+  }
+
+  static fromJson: FromJson<FirestoreEventJsonV0 | FirestoreEventJsonV1, FirestoreEvent> = (json, additionalOptions) => {
+    const {schemaVersion: forceSchemaVersion,documentId} = additionalOptions ?? {};
     const schemaVersion = forceSchemaVersion ?? (hasFirestoreMetadata(json) ? json.__meta.schemaVersion ?? 0 : 0);
 
-    switch (schemaVersion) {
+    switch (forceSchemaVersion) {
       case 0: {
-        const {
-          title,
-          shortDescription,
-          description,
-          image,
-          address,
-          startTime,
-          endTime,
-          link,
-        } = json as unknown as FirestoreEventJsonV0;
-
-        if (startTime == null || endTime == null) {
-          throw new Error("Event must have a start and end time");
-        }
-
-        let images: FirestoreImage[] | undefined;
-
-        if (image) {
-          if (Array.isArray(image)) {
-            images = image.map(FirestoreImage.fromJson);
-          } else {
-            images = [FirestoreImage.fromJson(image)];
-          }
-        }
-
-        return new FirestoreEvent(
-          title,
-          shortDescription ?? "",
-          description,
-          {
-            start: startTime,
-            end: endTime,
-          },
-          undefined,
-          address,
-          images,
-          link ? Array.isArray(link) ? link : [link] : undefined
-        );
+        throw new Error("Schema version 0 is no longer supported")
       }
       case 1: {
         const returnVal = new FirestoreEvent(
@@ -185,23 +168,18 @@ export class FirestoreEvent {
           (json as FirestoreEventJsonV1).interval,
           (json as FirestoreEventJsonV1).intervals,
           (json as FirestoreEventJsonV1).address,
-          (json as FirestoreEventJsonV1).images?.map(FirestoreImage.fromJson),
+          (json as FirestoreEventJsonV1).images?.map((image) => FirestoreImage.fromJson(image)),
           (json as FirestoreEventJsonV1).highlightedLinks
         );
 
         if (hasFirestoreMetadata(json)) {
-          if (json.__meta.createdAt) {
-            returnVal.createdAt = json.__meta.createdAt;
-          }
-          if (json.__meta.modifiedAt) {
-            returnVal.modifiedAt = json.__meta.modifiedAt;
-          }
+          returnVal.documentMetadata = json.__meta;
         }
 
         return returnVal;
       }
       default: {
-        throw new Error(`Unknown schema version: ${schemaVersion}`);
+        throw new Error(`Unknown schema version: ${forceSchemaVersion}`);
       }
     }
   }
@@ -209,6 +187,7 @@ export class FirestoreEvent {
   toJson(): WithFirestoreMetadata<FirestoreEventJsonV1, 1> {
     const returnVal: WithFirestoreMetadata<FirestoreEventJsonV1, 1> = {
       __meta: {
+        ...(this.documentMetadata ?? {}),
         schemaVersion: 1,
       },
       name: this.name,
@@ -232,24 +211,18 @@ export class FirestoreEvent {
       returnVal.highlightedLinks = this.highlightedLinks;
     }
 
-    if (this.createdAt) {
-      returnVal.__meta.createdAt = this.createdAt;
-    }
-    if (this.modifiedAt) {
-      returnVal.__meta.modifiedAt = this.modifiedAt;
-    }
-
     return returnVal;
   }
 
   static whatIsWrongWithThisJson: WhatIsWrongWithThisJson<FirestoreEventJson> = (json) => {
-    const schemaVersion = hasFirestoreMetadata(json) ? json.__meta.schemaVersion ?? 0 : 0;
+    const schemaVersion = hasFirestoreMetadata(json) ? json.__meta.schemaVersion ?? 1 : 1;
 
     let isSomethingWrong = false;
     const errors: FormErrors<FirestoreEventJson> = {};
 
     switch (schemaVersion) {
       case 0: {
+        throw new Error("Schema version 0 is no longer supported");
         break;
       }
       case 1: {
@@ -405,14 +378,6 @@ export class FirestoreEvent {
     }
 
     return true;
-  }
-
-  get createdAtDate(): BasicTimestamp | undefined {
-    return this.createdAt;
-  }
-
-  get modifiedAtDate(): BasicTimestamp | undefined {
-    return this.modifiedAt;
   }
 
   get intervals(): FirestoreEventInterval[] {
