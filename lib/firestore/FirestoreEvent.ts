@@ -153,7 +153,7 @@ export class FirestoreEvent {
   }
 
   static fromJson: FromJson<FirestoreEventJsonV0 | FirestoreEventJsonV1, FirestoreEvent> = (json, additionalOptions) => {
-    const {schemaVersion: forceSchemaVersion,documentId} = additionalOptions ?? {};
+    const {schemaVersion: forceSchemaVersion, documentId} = additionalOptions ?? {};
     const schemaVersion = forceSchemaVersion ?? (hasFirestoreMetadata(json) ? json.__meta.schemaVersion ?? 0 : 0);
 
     switch (forceSchemaVersion) {
@@ -174,6 +174,14 @@ export class FirestoreEvent {
 
         if (hasFirestoreMetadata(json)) {
           returnVal.documentMetadata = json.__meta;
+          if (documentId != null) {
+            returnVal.documentMetadata.documentId = documentId;
+          }
+        } else if (documentId != null) {
+          returnVal.documentMetadata = {
+            documentId,
+            schemaVersion: 1
+          };
         }
 
         return returnVal;
