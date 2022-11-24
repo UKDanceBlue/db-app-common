@@ -1,6 +1,6 @@
 import { AllowedFirestoreTypes } from "../shims/Firestore.js";
-import { DownloadableImage, DownloadableImageJson, FirestoreImage, FirestoreImageJsonV1 } from "./FirestoreImage.js";
-import { FirestoreDocumentJson } from "./internal.js";
+import { DownloadableImage, DownloadableImageJson, FirestoreImage, FirestoreImageJsonV1 } from ".";
+import { FirestoreDocumentJson } from ".";
 
 export interface FirestoreSponsorJson extends FirestoreDocumentJson {
   link?: string;

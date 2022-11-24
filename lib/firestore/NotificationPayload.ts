@@ -1,5 +1,5 @@
 import { AllowedFirestoreTypes } from "../shims/Firestore.js";
-import { FirestoreImageJsonV1 } from "./FirestoreImage.js";
+import { FirestoreImageJsonV1 } from ".";
 
 export interface NotificationInfoPopup extends Record<string, AllowedFirestoreTypes> {
   title: string;

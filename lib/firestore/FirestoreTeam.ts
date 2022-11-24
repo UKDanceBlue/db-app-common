@@ -1,4 +1,4 @@
-import { FirestoreDocumentJson } from "./internal.js";
+import { FirestoreDocumentJson } from ".";
 
 export interface FirestoreTeamJson extends FirestoreDocumentJson {
   name: string;

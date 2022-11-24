@@ -1,6 +1,6 @@
-import { FirestoreNotification } from "./FirestoreNotification.js";
+import { FirestoreNotification } from ".";
 import { AllowedFirestoreTypes, FirestoreDocumentReference } from "../shims/Firestore.js";
-import { FirestoreDocumentJson } from "./internal.js";
+import { FirestoreDocumentJson } from ".";
 
 export interface FirestoreUserJson extends FirestoreDocumentJson {
   attributes: Record<string, string>;
