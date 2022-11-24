@@ -156,7 +156,7 @@ export class FirestoreEvent {
     const {schemaVersion: forceSchemaVersion, documentId} = additionalOptions ?? {};
     const schemaVersion = forceSchemaVersion ?? (hasFirestoreMetadata(json) ? json.__meta.schemaVersion ?? 0 : 0);
 
-    switch (forceSchemaVersion) {
+    switch (schemaVersion) {
       case 0: {
         throw new Error("Schema version 0 is no longer supported")
       }
@@ -187,7 +187,7 @@ export class FirestoreEvent {
         return returnVal;
       }
       default: {
-        throw new Error(`Unknown schema version: ${forceSchemaVersion}`);
+        throw new Error(`Unknown schema version: ${schemaVersion}`);
       }
     }
   }
