@@ -1,4 +1,4 @@
-import { FirestoreDocumentJson, IsValidJson, MaybeWithFirestoreMetadata, FromJson } from "./internal.js";
+import { FirestoreDocumentJson, IsValidJson, MaybeWithFirestoreMetadata, FromJson } from ".";
 
 export interface SpiritPointEntryJson extends FirestoreDocumentJson {
   points: number;

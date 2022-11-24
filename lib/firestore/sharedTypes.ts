@@ -1,6 +1,6 @@
 import { AllowedFirestoreTypes, FirestoreDocumentSnapshot } from "../shims/Firestore.js";
 import { FormErrors } from "../util/formReducer.js";
-import { FirestoreMetadata } from "./index.js";
+import { FirestoreMetadata } from ".";
 
 export interface FirestoreDocumentJson { }
 export interface FirestoreDocumentModelInstance<T extends FirestoreDocumentJson> {

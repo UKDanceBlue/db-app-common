@@ -1,5 +1,5 @@
 import { AllowedFirestoreTypes } from "../shims/Firestore.js";
-import { FromJson, FirestoreDocumentModelInstance, IsValidJson } from "./internal.js";
+import { FromJson, FirestoreDocumentModelInstance, IsValidJson } from ".";
 
 export interface FirestoreImageJsonV1 extends Record<string, AllowedFirestoreTypes> {
   uri: `gs://${string}` | `http${"s" | ""}://${string}`;

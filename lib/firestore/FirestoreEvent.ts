@@ -1,5 +1,5 @@
-import { FirestoreImageJsonV1, FirestoreImage, FirestoreMetadata } from "./index.js";
-import { FirestoreDocumentJson, FromJson, hasFirestoreMetadata, IsValidJson, WithFirestoreMetadata, WhatIsWrongWithThisJson, FromSnapshot, MaybeWithFirestoreMetadata } from "./internal.js";
+import { FirestoreImageJsonV1, FirestoreImage, FirestoreMetadata } from ".";
+import { FirestoreDocumentJson, FromJson, hasFirestoreMetadata, IsValidJson, WithFirestoreMetadata, WhatIsWrongWithThisJson, FromSnapshot, MaybeWithFirestoreMetadata } from ".";
 import { BasicTimestamp, AllowedFirestoreTypes, isTimestampLike } from "../shims/Firestore.js";
 import { FormErrors } from "../util/formReducer.js";
 import { RecursivePartial } from "../util/index.js";
