@@ -1,6 +1,8 @@
 import { useReducer, useState } from "react";
 
-if (!useReducer || !useState)
+import type { ExtendedPrimitive } from "./TypeUtils";
+
+if (!(useReducer as unknown) || !(useState as unknown))
   throw new Error("This file is only for use with React");
 
 export type UpdatePayload<T extends object, K extends keyof T = keyof T> = [
@@ -17,8 +19,14 @@ export type FormErrors<T extends object> = Partial<
  * - "update": Updates the form with a new value
  * - "remove-field": Removes a field from the form (ONLY USE FOR OPTIONAL FIELDS)
  * - "set": Sets the entire form to a new value
+ *
+ * @param initialState The initial state of the form
+ * @param validator A function that validates the form and returns an object with errors
+ * @return A tuple with the reducer and the errors
  */
-export const useFormReducer = <T extends object>(
+export const useFormReducer = <
+  T extends Map<string | number | symbol, ExtendedPrimitive>
+>(
   initialState: T,
   validator?: (state: T) => FormErrors<T>
 ) => {
@@ -31,7 +39,7 @@ export const useFormReducer = <T extends object>(
         | ["update", UpdatePayload<T>]
         | ["remove-field", keyof T]
         | ["set", T]
-    ) => {
+    ): T => {
       switch (newState[0]) {
         case "reset": {
           return initialState;
@@ -50,7 +58,7 @@ export const useFormReducer = <T extends object>(
           const updatedState = {
             ...state,
           };
-          delete updatedState[newState[1]];
+          updatedState.delete(newState[1]);
           if (validator) {
             setErrors(validator(updatedState));
           }

@@ -1,4 +1,6 @@
 export * from "./util";
+export * from "./query";
+export * from "./auth";
 
 /*
 Note:
