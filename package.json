@@ -7,7 +7,13 @@
     "type": "git",
     "url": "https://github.com/UKDanceBlue/db-app-common.git"
   },
-  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "dist"
   ],
@@ -22,7 +28,7 @@
     "@types/react": "^18",
     "typescript": "^4.8.4"
   },
-  "peerDependencies": {
+  "optionalDependencies": {
     "react": "^18"
   }
 }
