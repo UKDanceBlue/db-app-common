@@ -1,12 +1,15 @@
 # Request types
 
 These type definitions describe valid bodies, url parameters, and query
-parameters for various routes. The files should consist of something like:
+parameters for various routes. In update routes, null should be used to indicate
+that an optional value should be removed.
 
 NOTE: _All dates and times are ISO 8601 strings._
 
+The files should consist of something like:
+
 ```typescript
-export interface SomeRouteBody {
+export interface CreateSomeRouteBody {
   aTextValue: string;
   startDateTime: string; // Date and time
   endTime: string; // Time only
@@ -19,7 +22,7 @@ export interface SomeRouteBody {
 }
 
 // If necessary:
-export interface ParsedSomeRouteBody {
+export interface ParsedCreateSomeRouteBody {
   aTextValue: string;
   startDateTime: DateTime;
   endTime: DateTime;
@@ -30,14 +33,19 @@ export interface ParsedSomeRouteBody {
   count: number;
 }
 
-export interface SomeRouteParams {
+export type EditSomeRouteBody = CreateBodyToEditBody<CreateSomeRouteBody>;
+
+export type ParsedEditSomeRouteBody =
+  CreateBodyToEditBody<ParsedCreateSomeRouteBody>;
+
+export interface GetSomeRouteParams {
   id: string;
 }
 
-export interface SomeRouteQuery {
-  page: number;
-  pageSize: number;
-}
+export interface ListSomeRoutesQuery
+  extends SortingOptions,
+    PaginationOptions {}
 ```
 
-Remember to update the relevant validator when modifying these files.
+Remember to update the relevant server-side validator when modifying these
+files.

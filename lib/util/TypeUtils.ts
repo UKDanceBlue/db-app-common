@@ -1,4 +1,5 @@
-export type Primitive = string | number | bigint | boolean | null | undefined;
+export type SimplePrimitive = string | number | boolean;
+export type Primitive = SimplePrimitive | bigint | null | undefined;
 export type ExtendedPrimitive =
   | Primitive
   | Record<string | number | symbol, Primitive>;
@@ -20,3 +21,25 @@ export type OptionalNullOrUndefined<T> = Partial<{
 export type Abstract<T> = Function & { prototype: T };
 export type Constructor<T> = new (...args: unknown[]) => T;
 export type Class<T> = Abstract<T> | Constructor<T>;
+
+export type OptionalToNullable<T> = {
+  [K in keyof T]: T[K] extends NonNullable<T[K]> ? T[K] : T[K] | null;
+};
+
+export enum Comparator {
+  EQUALS = "eq",
+  GREATER_THAN = "gt",
+  LESS_THAN = "lt",
+  GREATER_THAN_OR_EQUAL_TO = "gte",
+  LESS_THAN_OR_EQUAL_TO = "lte",
+  INCLUDES = "incl",
+}
+
+export type StringComparator = Comparator.EQUALS | Comparator.INCLUDES;
+export type NumericComparator =
+  | Comparator.EQUALS
+  | Comparator.GREATER_THAN
+  | Comparator.LESS_THAN
+  | Comparator.GREATER_THAN_OR_EQUAL_TO
+  | Comparator.LESS_THAN_OR_EQUAL_TO;
+export type BooleanComparator = Comparator.EQUALS;
