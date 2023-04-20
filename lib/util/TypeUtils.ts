@@ -17,6 +17,8 @@ export type OptionalNullOrUndefined<T> = Partial<{
   [K in keyof T]: NonNullable<T[K]> | null | undefined;
 }>;
 
+export type SelfOrArray<T> = T | T[];
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Abstract<T> = Function & { prototype: T };
 export type Constructor<T> = new (...args: unknown[]) => T;

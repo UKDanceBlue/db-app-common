@@ -8,9 +8,6 @@ import type {
   StringComparator,
 } from "../../util/TypeUtils.js";
 
-// !TODO add a "resources" directory to lib which contains interfaces that the ORM models then implement
-// This will allow us to maintain consistent types between the ORM and the shared library
-
 /**
  * Date fields should be sent as ISO 8601 strings.
  */

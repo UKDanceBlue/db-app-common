@@ -15,12 +15,12 @@ export interface BaseResponse {
   clientAction?: ClientAction[];
 }
 
-export interface OkApiResponse<DataType> extends BaseResponse {
+export interface OkApiResponse<Resource> extends BaseResponse {
   ok: true;
   /**
    * The payload of the response (can be pretty much anything)
    */
-  data?: DataType;
+  data?: Resource;
 }
 
 /**
@@ -30,12 +30,12 @@ export interface OkApiResponse<DataType> extends BaseResponse {
  * @param opts.value The response data
  * @return The OK API response
  */
-export function okResponseFrom<DataType>({
+export function okResponseFrom<Resource>({
   value = undefined,
 }: {
-  value?: DataType;
-} = {}): OkApiResponse<DataType> {
-  const response: OkApiResponse<DataType> = {
+  value?: Resource;
+} = {}): OkApiResponse<Resource> {
+  const response: OkApiResponse<Resource> = {
     ok: true,
   };
   if (value !== undefined) {
@@ -44,7 +44,7 @@ export function okResponseFrom<DataType>({
   return response;
 }
 
-export interface CreatedApiResponse<DataType> extends OkApiResponse<DataType> {
+export interface CreatedApiResponse<Resource> extends OkApiResponse<Resource> {
   /**
    * The ID of the created resource (this is the UUID not the sequential ID)
    */
@@ -60,14 +60,14 @@ export interface CreatedApiResponse<DataType> extends OkApiResponse<DataType> {
  * @param opts.id The ID of the created resource
  * @return The created API response
  */
-export function createdResponseFrom<DataType>({
+export function createdResponseFrom<Resource>({
   value,
   id,
 }: {
-  value?: DataType;
+  value?: Resource;
   id: string;
-}): CreatedApiResponse<DataType> {
-  const okResponse: OkApiResponse<DataType> =
+}): CreatedApiResponse<Resource> {
+  const okResponse: OkApiResponse<Resource> =
     value !== undefined ? okResponseFrom({ value }) : okResponseFrom();
   return {
     ...okResponse,
@@ -90,8 +90,8 @@ export interface PaginationInfo {
   total: number;
 }
 
-export interface PaginatedApiResponse<DataType>
-  extends OkApiResponse<DataType> {
+export interface PaginatedApiResponse<Resource>
+  extends OkApiResponse<Resource> {
   /**
    * The pagination settings the server used to generate the response
    */
@@ -160,7 +160,7 @@ export function errorResponseFrom({
   return response;
 }
 
-export type ApiResponse<DataType> =
-  | OkApiResponse<DataType>
-  | PaginatedApiResponse<DataType>
+export type ApiResponse<Resource> =
+  | OkApiResponse<Resource>
+  | PaginatedApiResponse<Resource>
   | ErrorApiResponse;
