@@ -1,10 +1,9 @@
-import { useReducer, useState } from "react";
-
 import type { ExtendedPrimitive } from "./TypeUtils";
+import { getReact } from "./reactLib";
+
+const { useState, useReducer } = getReact();
 
 type FormMap = Map<string | number | symbol, ExtendedPrimitive>;
-if (!(useReducer as unknown) || !(useState as unknown))
-  throw new Error("This file is only for use with React");
 
 export type UpdatePayload<T> = T extends Map<infer k, infer V> ? [k, V] : never;
 
