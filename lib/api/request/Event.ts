@@ -1,6 +1,6 @@
 import type { Interval } from "luxon";
 
-import { BodyDateTime } from "./htmlDateTime.js";
+import type { BodyDateTime } from "./htmlDateTime.js";
 
 export interface NewEventBody {
   eventTitle: string;

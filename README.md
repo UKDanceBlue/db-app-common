@@ -9,8 +9,3 @@ project (it is MIT after all) I can't imagine why you would want to.
 
 This package does NOT follow semver, the version changes with the significance
 of the changes in the release. Assume all changes are breaking.
-
-## IMPORTANT TODO
-
-The barrel files are just for testing, instead I'd rather use the "imports" in
-package.json

@@ -146,9 +146,14 @@ export function parseHtmlDateTimeString(
   htmlDateTimeString: HtmlDateTimeString
 ): HtmlDateTimeParts {
   const [date, time] = htmlDateTimeString.split("T") as [
-    HtmlDateString,
-    HtmlTimeString
+    HtmlDateString | undefined,
+    HtmlTimeString | undefined
   ];
+
+  if (!date || !time) {
+    throw new Error("Invalid HTML date time string");
+  }
+
   return {
     ...parseHtmlDateString(date),
     ...parseHtmlTimeString(time),

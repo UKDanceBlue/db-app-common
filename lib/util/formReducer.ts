@@ -2,14 +2,13 @@ import { useReducer, useState } from "react";
 
 import type { ExtendedPrimitive } from "./TypeUtils";
 
+type FormMap = Map<string | number | symbol, ExtendedPrimitive>;
 if (!(useReducer as unknown) || !(useState as unknown))
   throw new Error("This file is only for use with React");
 
-export type UpdatePayload<T extends object, K extends keyof T = keyof T> = [
-  K,
-  T[K]
-];
-export type FormErrors<T extends object> = Partial<
+export type UpdatePayload<T> = T extends Map<infer k, infer V> ? [k, V] : never;
+
+export type FormErrors<T extends FormMap> = Partial<
   Record<keyof T | "%STRUCTURE%", boolean | string>
 >;
 
@@ -24,9 +23,7 @@ export type FormErrors<T extends object> = Partial<
  * @param validator A function that validates the form and returns an object with errors
  * @return A tuple with the reducer and the errors
  */
-export const useFormReducer = <
-  T extends Map<string | number | symbol, ExtendedPrimitive>
->(
+export const useFormReducer = <T extends FormMap>(
   initialState: T,
   validator?: (state: T) => FormErrors<T>
 ) => {
@@ -34,21 +31,20 @@ export const useFormReducer = <
   const reducer = useReducer(
     (
       state: T,
-      newState:
+      [keyword, payload]:
         | ["reset"]
         | ["update", UpdatePayload<T>]
         | ["remove-field", keyof T]
         | ["set", T]
     ): T => {
-      switch (newState[0]) {
+      const updatedState = state;
+      switch (keyword) {
         case "reset": {
           return initialState;
         }
         case "update": {
-          const updatedState = {
-            ...state,
-            [newState[1][0]]: newState[1][1],
-          };
+          const [key, newValue] = payload;
+          updatedState.set(key, newValue);
           if (validator) {
             setErrors(validator(updatedState));
           }
@@ -58,7 +54,7 @@ export const useFormReducer = <
           const updatedState = {
             ...state,
           };
-          updatedState.delete(newState[1]);
+          updatedState.delete(payload);
           if (validator) {
             setErrors(validator(updatedState));
           }
@@ -66,9 +62,9 @@ export const useFormReducer = <
         }
         case "set": {
           if (validator) {
-            setErrors(validator(newState[1]));
+            setErrors(validator(payload));
           }
-          return newState[1];
+          return payload;
         }
         default: {
           throw new Error("Invalid action");
