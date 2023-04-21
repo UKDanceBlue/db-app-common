@@ -7,5 +7,5 @@ export interface LoginFlowSessionResource {
 
   creationDate: DateTime;
 
-  redirectToAfterLogin?: string;
+  redirectToAfterLogin?: string | null;
 }

@@ -12,19 +12,19 @@ export interface PersonResource {
    */
   authIds: Partial<Record<AuthSource, string>>;
 
-  firstName: string;
+  firstName: string | null;
 
-  lastName: string;
+  lastName: string | null;
 
   email: string;
 
-  linkblue: string;
+  linkblue: string | null;
 
   role: RoleResource;
 
-  memberOf?: TeamResource[];
+  memberOf: TeamResource[];
 
-  captainOf?: TeamResource[];
+  captainOf: TeamResource[];
 
-  pointEntries?: PointEntryResource[];
+  pointEntries: PointEntryResource[];
 }

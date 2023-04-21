@@ -15,9 +15,9 @@ export interface EventResource {
 
   title: string;
 
-  summary: string;
+  summary: string | null;
 
-  description: string;
+  description: string | null;
 
-  location: string;
+  location: string | null;
 }

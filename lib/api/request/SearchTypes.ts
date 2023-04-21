@@ -3,7 +3,7 @@
  * it is just a reference for future work
  */
 
-import type { Comparator } from "../..";
+import type { Comparator } from "../../util/TypeUtils.js";
 
 interface SearchEntryBase<
   FieldName extends string,
