@@ -7,9 +7,6 @@ import type { TeamResource } from "./Team.js";
 export interface PersonResource {
   userId: string;
 
-  /**
-   * This is usually either a random uuid, or the oid claim from the OIDC id_token, depending on the auth source
-   */
   authIds: Partial<Record<AuthSource, string>>;
 
   firstName: string | null;

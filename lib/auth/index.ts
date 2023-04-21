@@ -1,5 +1,6 @@
 export enum AuthSource {
   UkyLinkblue = "uky-linkblue",
+  Anonymous = "anonymous",
 }
 
 export enum AccessLevel {
@@ -42,10 +43,13 @@ export interface UserData {
 
 export interface JwtPayload {
   sub: string;
+  // The type of authentication used to log in (e.g. "uky-linkblue" or "anonymous")
+  auth_source: AuthSource;
+  // TODO: Replace these fields with either "roles" or "groups" (these are specified in the RFC 7643 Section 4.1.2)
   dbRole: DbRole;
-  committeeRole?: CommitteeRole;
+  committee_role?: CommitteeRole;
   committee?: string;
-  accessLevel: AccessLevel;
-  teamIds?: string[];
-  captainOfTeamIds?: string[];
+  access_level: AccessLevel;
+  team_ids?: string[];
+  captain_of_team_ids?: string[];
 }
