@@ -5,7 +5,7 @@ export enum EditType {
   REPLACE = 1,
 }
 
-type EditArray<T extends unknown[]> =
+export type EditArray<T extends unknown[] | (unknown[] | undefined)> =
   | {
       type: EditType.MODIFY;
       /**
@@ -23,7 +23,8 @@ type EditArray<T extends unknown[]> =
        * Replacement for the array
        */
       set: T;
-    };
+    }
+  | (T extends NonNullable<T> ? never : undefined);
 
 type CreateBodyToEditBodyUtil<T> = {
   [K in keyof T]: T[K] extends unknown[]

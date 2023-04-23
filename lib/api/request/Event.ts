@@ -1,8 +1,14 @@
 import type { Interval } from "luxon";
 
-import type { CreateBodyToEditBody } from "./BodyTypes.js";
-import type { PaginationOptions, SortingOptions } from "./ListQueryTypes.js";
 import type { BodyDateTime } from "../../util/htmlDateTime.js";
+import type { EventResource } from "../resource/Event.js";
+
+import type { CreateBodyToEditBody } from "./BodyTypes.js";
+import type {
+  FilterOptions,
+  PaginationOptions,
+  SortingOptions,
+} from "./ListQueryTypes.js";
 
 export interface CreateEventBody {
   eventTitle: string;
@@ -29,7 +35,10 @@ export type EditEventBody = CreateBodyToEditBody<CreateEventBody>;
 export type ParsedEditEventBody = CreateBodyToEditBody<ParsedCreateEventBody>;
 
 export interface GetEventParams {
-  id: string;
+  eventId: string;
 }
 
-export interface ListEventsQuery extends SortingOptions, PaginationOptions {}
+export interface ListEventsQuery
+  extends SortingOptions,
+    PaginationOptions,
+    FilterOptions<EventResource> {}

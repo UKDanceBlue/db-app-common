@@ -28,7 +28,9 @@ export type OptionalToNullable<T> = T extends object
   ? {
       [K in keyof T]: T[K] extends NonNullable<T[K]> ? T[K] : T[K] | null;
     }
-  : T;
+  : T extends NonNullable<T>
+  ? T
+  : T | null;
 
 export enum Comparator {
   EQUALS = "eq",

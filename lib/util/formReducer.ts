@@ -1,8 +1,6 @@
 import type { ExtendedPrimitive } from "./TypeUtils.js";
 import { getReact } from "./reactLib.js";
 
-const { useState, useReducer } = getReact();
-
 type FormMap = Map<string | number | symbol, ExtendedPrimitive>;
 
 export type UpdatePayload<T> = T extends Map<infer k, infer V> ? [k, V] : never;
@@ -26,6 +24,8 @@ export const useFormReducer = <T extends FormMap>(
   initialState: T,
   validator?: (state: T) => FormErrors<T>
 ) => {
+  const { useState, useReducer } = getReact();
+
   const [errors, setErrors] = useState<FormErrors<T>>({});
   const reducer = useReducer(
     (

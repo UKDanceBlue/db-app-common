@@ -4,7 +4,6 @@ import type {
   BooleanComparator,
   Comparator,
   NumericComparator,
-  Primitive,
   StringComparator,
 } from "../../util/TypeUtils.js";
 
@@ -12,14 +11,10 @@ import type {
  * Date fields should be sent as ISO 8601 strings.
  */
 export interface FilterItem<
-  Resource extends Record<string, Primitive | DateTime>,
+  Resource extends object,
   Key extends keyof Resource & string = keyof Resource & string,
   ValueType extends Resource[Key] = Resource[Key]
 > {
-  /**
-   * The field to filter on.
-   */
-  field: Key;
   /**
    * The value to filter on.
    * If this is an array, the field will be filtered on any of the values.
@@ -71,7 +66,7 @@ export interface SortingOptions {
   sortDirection?: "asc" | "desc";
 }
 
-export interface FilterOptions<Resource extends Record<string, Primitive>> {
+export interface FilterOptions<Resource extends object> {
   /**
    * The fields to include in the response.
    * If this is not specified, default fields will be included.
@@ -87,5 +82,8 @@ export interface FilterOptions<Resource extends Record<string, Primitive>> {
    * A list of filters to apply to the request, this will search
    * the database for only the resources that match the filters.
    */
-  filter?: FilterItem<Resource, keyof Resource & string>[];
+  filter?: Record<
+    keyof Resource & string,
+    FilterItem<Resource, keyof Resource & string>[]
+  >;
 }
