@@ -21,6 +21,8 @@
   ],
   "scripts": {
     "test": "jest",
+    "test-coverage": "jest --coverage",
+    "test-coverage-all": "jest --coverage --collectCoverageFrom=./lib/**/*",
     "build": "tsc",
     "prepare": "pnpm run build",
     "lint": "eslint . --ext .ts"

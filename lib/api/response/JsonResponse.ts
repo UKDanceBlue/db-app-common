@@ -52,8 +52,9 @@ export interface CreatedApiResponse<Resource> extends OkApiResponse<Resource> {
 }
 
 /**
- * Creates a created API response with the given data.
- * The response will have an `id` property.
+ * Creates a "created" API response indicating that a resource was successfully created.
+ * The response will have an `id` property that refers to the UUID of the created resource.
+ * It may also have a `data` property if the resource was returned in the response.
  *
  * @param opts The options
  * @param opts.value The response data

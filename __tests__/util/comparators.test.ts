@@ -1,62 +1,130 @@
 import { describe, expect, test } from "@jest/globals";
 import { DateTime, Interval } from "luxon";
 
-import { intervalSorter } from "../../lib/util/comparators";
+import { intervalComparator } from "../../lib/util/comparators.js";
 
-describe("intervalSorter", () => {
-  test("should return 0 if the intervals are the same", () => {
-    const interval = Interval.fromDateTimes(
-      DateTime.fromObject({ year: 2021, month: 1, day: 1 }),
-      DateTime.fromObject({ year: 2021, month: 1, day: 2 })
-    );
-    expect(intervalSorter(interval, interval)).toBe(0);
+describe("intervalComparator", () => {
+  const earlyDate = DateTime.fromObject(
+    {
+      year: 2020,
+      month: 3,
+      day: 5,
+      hour: 3,
+      minute: 9,
+      second: 0,
+    },
+    { zone: "utc" }
+  );
+  const midDate1 = DateTime.fromObject(
+    {
+      year: 2020,
+      month: 5,
+      day: 5,
+      hour: 3,
+      minute: 9,
+      second: 0,
+    },
+    { zone: "utc" }
+  );
+  const midDate2 = DateTime.fromObject(
+    {
+      year: 2020,
+      month: 5,
+      day: 6,
+      hour: 3,
+      minute: 9,
+      second: 0,
+    },
+    { zone: "utc" }
+  );
+  const lateDate = DateTime.fromObject(
+    {
+      year: 2020,
+      month: 7,
+      day: 6,
+      hour: 6,
+      minute: 2,
+      second: 0,
+    },
+    { zone: "utc" }
+  );
+
+  // Fully bounded intervals:
+  const testIntervalEarlyMid1 = Interval.fromDateTimes(earlyDate, midDate1);
+  const testIntervalEarlyMid2 = Interval.fromDateTimes(earlyDate, midDate2);
+  const testIntervalEarlyLate = Interval.fromDateTimes(earlyDate, lateDate);
+  const testIntervalMid1Mid2 = Interval.fromDateTimes(midDate1, midDate2);
+  const testIntervalMid1Late = Interval.fromDateTimes(midDate1, lateDate);
+  const testIntervalMid2Late = Interval.fromDateTimes(midDate2, lateDate);
+
+  // Invalid interval:
+  const testIntervalMid2Mid1 = Interval.fromDateTimes(midDate2, midDate1);
+
+  test("returns negative when the first interval's start is before and the ends are the same", () => {
+    expect(
+      intervalComparator(testIntervalEarlyMid2, testIntervalMid1Mid2)
+    ).toBeLessThan(0);
+    expect(
+      intervalComparator(testIntervalMid1Late, testIntervalMid2Late)
+    ).toBeLessThan(0);
   });
 
-  test("should return a positive number if the first interval is after the second", () => {
-    const interval1 = Interval.fromDateTimes(
-      DateTime.fromObject({ year: 2021, month: 1, day: 1 }),
-      DateTime.fromObject({ year: 2021, month: 1, day: 2 })
-    );
-    const interval2 = Interval.fromDateTimes(
-      DateTime.fromObject({ year: 2021, month: 1, day: 2 }),
-      DateTime.fromObject({ year: 2021, month: 1, day: 3 })
-    );
-    expect(intervalSorter(interval1, interval2)).toBeGreaterThan(0);
+  test("returns positive when the first interval's start is after and the ends are the same", () => {
+    expect(
+      intervalComparator(testIntervalMid1Mid2, testIntervalEarlyMid2)
+    ).toBeGreaterThan(0);
+    expect(
+      intervalComparator(testIntervalMid2Late, testIntervalMid1Late)
+    ).toBeGreaterThan(0);
   });
 
-  test("should return a negative number if the first interval is before the second", () => {
-    const interval1 = Interval.fromDateTimes(
-      DateTime.fromObject({ year: 2021, month: 1, day: 1 }),
-      DateTime.fromObject({ year: 2021, month: 1, day: 2 })
-    );
-    const interval2 = Interval.fromDateTimes(
-      DateTime.fromObject({ year: 2021, month: 1, day: 2 }),
-      DateTime.fromObject({ year: 2021, month: 1, day: 3 })
-    );
-    expect(intervalSorter(interval2, interval1)).toBeLessThan(0);
+  test("returns negative when the first interval's end is before and the starts are the same", () => {
+    expect(
+      intervalComparator(testIntervalEarlyMid1, testIntervalEarlyMid2)
+    ).toBeLessThan(0);
+    expect(
+      intervalComparator(testIntervalMid1Mid2, testIntervalMid1Late)
+    ).toBeLessThan(0);
   });
 
-  test("should return a positive number if the first interval starts after the second", () => {
-    const interval1 = Interval.fromDateTimes(
-      DateTime.fromObject({ year: 2021, month: 1, day: 1 }),
-      DateTime.fromObject({ year: 2021, month: 1, day: 2 })
-    );
-    const interval2 = Interval.fromDateTimes(
-      DateTime.fromObject({ year: 2021, month: 1, day: 1 }),
-      DateTime.fromObject({ year: 2021, month: 1, day: 3 })
-    );
-    expect(intervalSorter(interval1, interval2)).toBeGreaterThan(0);
+  test("returns positive when the first interval's end is after and the starts are the same", () => {
+    expect(
+      intervalComparator(testIntervalEarlyMid2, testIntervalEarlyMid1)
+    ).toBeGreaterThan(0);
+    expect(
+      intervalComparator(testIntervalMid1Late, testIntervalMid1Mid2)
+    ).toBeGreaterThan(0);
   });
 
-  test("should return a negative number if the first interval starts before the second", () => {
-    const interval1 = Interval.fromDateTimes(
-      DateTime.fromObject({ year: 2021, month: 1, day: 1 }),
-      DateTime.fromObject({ year: 2021, month: 1, day: 2 })
-    );
-    const interval2 = Interval.fromDateTimes(
-      DateTime.fromObject({ year: 2021, month: 1, day: 1 }),
-      DateTime.fromObject({ year: 2021, month: 1, day: 3 })
-    );
-    expect(intervalSorter(interval2, interval1)).toBeLessThan(0);
+  test("returns negative when the first interval engulfs the second", () => {
+    expect(
+      intervalComparator(testIntervalEarlyLate, testIntervalMid1Mid2)
+    ).toBeLessThan(0);
+    expect(
+      intervalComparator(testIntervalEarlyLate, testIntervalMid1Late)
+    ).toBeLessThan(0);
+    expect(
+      intervalComparator(testIntervalEarlyLate, testIntervalMid2Late)
+    ).toBeLessThan(0);
+  });
+
+  test("returns 0 when the intervals are the same", () => {
+    expect(
+      intervalComparator(testIntervalEarlyMid1, testIntervalEarlyMid1)
+    ).toBe(0);
+  });
+
+  test("throws an error for an invalid interval", () => {
+    expect(() =>
+      intervalComparator(testIntervalEarlyMid1, testIntervalMid2Mid1)
+    ).toThrow();
+
+    expect(() =>
+      intervalComparator(testIntervalMid2Mid1, testIntervalEarlyMid1)
+    ).toThrow();
+
+    expect(() =>
+      intervalComparator(testIntervalMid2Mid1, testIntervalMid2Mid1)
+    ).toThrow();
   });
 });

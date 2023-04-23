@@ -2,7 +2,7 @@ import type { Interval } from "luxon";
 
 import type { CreateBodyToEditBody } from "./BodyTypes.js";
 import type { PaginationOptions, SortingOptions } from "./ListQueryTypes.js";
-import type { BodyDateTime } from "./htmlDateTime.js";
+import type { BodyDateTime } from "../../util/htmlDateTime.js";
 
 export interface CreateEventBody {
   eventTitle: string;

@@ -1,40 +1,39 @@
 import type { Interval } from "luxon";
 
-// Comparators return positive if a > b, negative if a < b, and 0 if a === b
+import { validateInterval } from "./intervalTools.js";
 
 /**
  * This comparator considers the UTC timestamp of the intervals.
  *
- * Algorithm:
- * 1. Set null starts to 0 and null ends to Infinity
- * 2. If the intervals are equal, return 0
- * 2. If the intervals don't overlap, return the difference between the start and end times (signed)
- * 3. If the intervals do overlap, return the difference between the start times (signed) if they are different
- * 4. Otherwise, return the difference between the end times (signed)
- *
- * @param a The first interval
- * @param b The second interval
- * @return A number representing the difference between the intervals
+ * @param intervalA The first interval
+ * @param intervalB The second interval
+ * @return A number representing the difference between the intervals (almost always -1, 0, or 1)
  */
-export function intervalSorter(a: Interval, b: Interval): number {
-  if (a.equals(b)) {
-    return 0;
+export function intervalComparator(
+  intervalA: Interval,
+  intervalB: Interval
+): number {
+  const { interval: a, valid: validA } = validateInterval(intervalA);
+  const { interval: b, valid: validB } = validateInterval(intervalB);
+  if (!validA || !validB) {
+    throw new Error("Invalid interval");
   }
 
-  const aStart = a.start?.toMillis() ?? 0;
-  const aEnd = a.end?.toMillis() ?? Number.POSITIVE_INFINITY;
-  const bStart = b.start?.toMillis() ?? 0;
-  const bEnd = b.end?.toMillis() ?? Number.POSITIVE_INFINITY;
-
-  if (aEnd < bStart) {
-    // If a ends before b starts, return by how much
-    return bStart - aEnd;
-  } else if (aStart > bEnd) {
-    // If a starts after b ends, return by how much
-    return bEnd - aStart;
-  } else if (aStart !== bStart) {
-    return bStart - aStart;
-  } else {
-    return bEnd - aEnd;
+  // Check the start of the intervals
+  if (!a.start.equals(b.start)) {
+    // If they are different, find out by how much
+    const startDiff = a.start.toMillis() - b.start.toMillis();
+    // ..and return the sign of the difference
+    return Math.sign(startDiff);
   }
+
+  // Check the end of the intervals
+  if (!a.end.equals(b.end)) {
+    // If they are different, find out by how much
+    const endDiff = a.end.toMillis() - b.end.toMillis();
+    // ..and return the sign of the difference
+    return Math.sign(endDiff);
+  }
+
+  return 0;
 }

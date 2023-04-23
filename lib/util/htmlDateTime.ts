@@ -28,8 +28,10 @@ export function isHtmlMonthString(
 export function parseHtmlMonthString(
   htmlMonthString: HtmlMonthString
 ): HtmlMonthParts {
-  const [year, month] = htmlMonthString.split("-").map(Number);
-  if (!year || !month) {
+  const [year, month, rest] = htmlMonthString
+    .split("-")
+    .map((num) => Number.parseInt(num, 10));
+  if (!year || Number.isNaN(year) || !month || Number.isNaN(month) || rest) {
     throw new Error("Invalid HTML month string");
   }
   return { year, month };
@@ -61,8 +63,17 @@ export function isHtmlDateString(
 export function parseHtmlDateString(
   htmlDateString: HtmlDateString
 ): HtmlDateParts {
-  const [year, month, day] = htmlDateString.split("-").map(Number);
-  if (!year || !month || !day) {
+  const [year, month, day, rest] = htmlDateString
+    .split("-")
+    .map((num) => Number.parseInt(num, 10));
+  if (
+    year == null ||
+    Number.isNaN(year) ||
+    month == null ||
+    Number.isNaN(month) ||
+    day == null ||
+    rest
+  ) {
     throw new Error("Invalid HTML date string");
   }
   return { year, month, day };
@@ -99,15 +110,20 @@ export function isHtmlTimeString(
 export function parseHtmlTimeString(
   htmlTimeString: HtmlTimeString
 ): HtmlTimeParts {
-  const [hour, minute, second] = htmlTimeString.split(":").map(Number);
+  const [hour, minute, second, rest] = htmlTimeString
+    .split(":")
+    .map((num) => Number.parseInt(num, 10));
   if (
     hour == null ||
+    Number.isNaN(hour) ||
     minute == null ||
+    Number.isNaN(minute) ||
     hour > 23 ||
     hour < 0 ||
     minute > 59 ||
     minute < 0 ||
-    (second && !(second >= 0 && second < 60))
+    (second && !(second >= 0 && second < 60)) ||
+    rest
   ) {
     throw new Error("Invalid HTML time string");
   }
@@ -137,6 +153,9 @@ export function isHtmlDateTimeString(
 
 /**
  * Parses an HTML date time string into a Luxon DateTime.
+ *
+ * WARNING: This function has limited validation, only provide known valid HTML
+ * date time strings to avoid errors.
  *
  * @param htmlDateTimeString The HTML date time string (e.g. "2021-10-31T12:00:00")
  * @return The day, month, year, hour, minute, and second number
