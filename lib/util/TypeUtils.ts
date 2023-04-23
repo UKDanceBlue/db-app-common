@@ -24,9 +24,11 @@ export type Abstract<T> = Function & { prototype: T };
 export type Constructor<T> = new (...args: unknown[]) => T;
 export type Class<T> = Abstract<T> | Constructor<T>;
 
-export type OptionalToNullable<T> = {
-  [K in keyof T]: T[K] extends NonNullable<T[K]> ? T[K] : T[K] | null;
-};
+export type OptionalToNullable<T> = T extends object
+  ? {
+      [K in keyof T]: T[K] extends NonNullable<T[K]> ? T[K] : T[K] | null;
+    }
+  : T;
 
 export enum Comparator {
   EQUALS = "eq",

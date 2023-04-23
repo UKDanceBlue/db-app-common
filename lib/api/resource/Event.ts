@@ -1,4 +1,4 @@
-import type { DateTime, Interval } from "luxon";
+import type { Interval } from "luxon";
 
 import type { ImageResource } from "./Image.js";
 
@@ -7,11 +7,7 @@ export interface EventResource {
 
   images: ImageResource[];
 
-  start: DateTime[];
-
-  end: DateTime[];
-
-  intervals: Interval[];
+  occurrences: Interval[];
 
   title: string;
 

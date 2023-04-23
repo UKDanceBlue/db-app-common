@@ -8,6 +8,8 @@ export * from "./api/request/Image.js";
 export * from "./api/request/htmlDateTime.js";
 export * from "./auth/index.js";
 
+export * from "./util/comparators.js";
+
 export { ClientResource } from "./api/resource/Client.js";
 export { ConfigurationResource } from "./api/resource/Configuration.js";
 export { EventResource } from "./api/resource/Event.js";

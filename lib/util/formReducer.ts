@@ -1,5 +1,5 @@
-import type { ExtendedPrimitive } from "./TypeUtils";
-import { getReact } from "./reactLib";
+import type { ExtendedPrimitive } from "./TypeUtils.js";
+import { getReact } from "./reactLib.js";
 
 const { useState, useReducer } = getReact();
 

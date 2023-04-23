@@ -1,4 +1,4 @@
-jest.config.js
+jest.config.ts
 jest.setup.js
 public-ts/
 public/script*
