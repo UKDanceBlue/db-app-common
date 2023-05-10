@@ -1,6 +1,7 @@
+import type { DbRole } from "../../index.js";
+
 import type { PersonResource } from "./Person.js";
 import type { PointEntryResource } from "./PointEntry.js";
-import type { RoleResource } from "./Role.js";
 
 export enum TeamType {
   Spirit = "Spirit",
@@ -14,11 +15,11 @@ export interface TeamResource {
 
   type: TeamType;
 
-  visibility: RoleResource;
+  visibility: DbRole;
 
-  members: PersonResource[];
+  members: PersonResource[] | string[];
 
-  captains: PersonResource[];
+  captains: PersonResource[] | string[];
 
-  pointEntries: PointEntryResource[];
+  pointEntries: PointEntryResource[] | string[];
 }

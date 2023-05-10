@@ -31,7 +31,8 @@
         "@typescript-eslint/no-misused-promises": "off",
         "@typescript-eslint/prefer-for-of": "off",
         "import/export": "off",
-        "@typescript-eslint/consistent-type-imports": "error"
+        "@typescript-eslint/consistent-type-imports": "error",
+        "@typescript-eslint/no-non-null-assertion": "off"
       }
     },
     {
@@ -41,8 +42,7 @@
       "rules": {
         "jest/prefer-todo": "warn",
         "jest/consistent-test-it": ["error", { "fn": "test" }],
-        "@typescript-eslint/no-unsafe-assignment": "off",
-        "@typescript-eslint/no-non-null-assertion": "off"
+        "@typescript-eslint/no-unsafe-assignment": "off"
       },
       "parserOptions": {
         "ecmaFeatures": {},
@@ -98,6 +98,8 @@
     "jsdoc/no-types": "off",
     "jsdoc/require-param-type": "off",
     "jsdoc/require-returns-type": "off",
+    // Don't require jsdoc
+    "jsdoc/require-jsdoc": "off",
     // Imports
     "import/named": "off",
     "import/namespace": "off",

@@ -19,9 +19,9 @@ export interface PersonResource {
 
   role: RoleResource;
 
-  memberOf: TeamResource[];
+  memberOf: TeamResource[] | string[];
 
-  captainOf: TeamResource[];
+  captainOf: TeamResource[] | string[];
 
-  pointEntries: PointEntryResource[];
+  pointEntries: PointEntryResource[] | string[];
 }

@@ -1,4 +1,4 @@
-import type { Interval } from "luxon";
+import type { DateTime, Duration } from "luxon";
 
 import type { BodyDateTime } from "../../util/htmlDateTime.js";
 import type { EventResource } from "../resource/Event.js";
@@ -15,10 +15,11 @@ export interface CreateEventBody {
   eventSummary?: string;
   eventDescription?: string;
   eventAddress?: string;
-  eventOccurrences: {
-    start: BodyDateTime;
-    end: BodyDateTime;
-  }[];
+  eventOccurrences: BodyDateTime[];
+  /**
+   * ISO 8601 duration string
+   */
+  eventDuration?: string;
   timezone?: string;
 }
 
@@ -27,7 +28,8 @@ export interface ParsedCreateEventBody {
   eventSummary?: string;
   eventDescription?: string;
   eventAddress?: string;
-  eventIntervals: Interval[];
+  eventOccurrences: DateTime[];
+  eventDuration?: Duration;
 }
 
 export type EditEventBody = CreateBodyToEditBody<CreateEventBody>;

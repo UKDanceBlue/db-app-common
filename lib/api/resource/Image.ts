@@ -1,7 +1,7 @@
 export interface ImageResource {
   imageId: string;
 
-  url: string | null;
+  url: URL | null;
 
   imageData: Uint8Array | null;
 

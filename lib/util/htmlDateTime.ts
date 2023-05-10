@@ -286,3 +286,8 @@ export function parseBodyDateTime(
 
   return dateTime;
 }
+
+export interface BodyDateTimeRange {
+  start: BodyDateTime;
+  end: BodyDateTime;
+}

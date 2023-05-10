@@ -12,7 +12,7 @@ export interface PointOpportunityResource {
 
   opportunityDate: DateTime | null;
 
-  personFrom: PersonResource | null;
+  personFrom: PersonResource | string | null;
 
-  team: TeamResource;
+  team: TeamResource | string;
 }

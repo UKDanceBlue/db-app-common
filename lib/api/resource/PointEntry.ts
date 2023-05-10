@@ -6,11 +6,11 @@ export interface PointEntryResource {
 
   type: TeamType;
 
-  description: string;
+  comment: string;
 
   points: number;
 
-  personFrom: PersonResource | null;
+  personFrom: PersonResource | string | null;
 
-  team: TeamResource;
+  team: TeamResource | string;
 }

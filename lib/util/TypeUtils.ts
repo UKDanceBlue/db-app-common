@@ -1,5 +1,5 @@
 export type SimplePrimitive = string | number | boolean;
-export type Primitive = SimplePrimitive | bigint | null | undefined;
+export type Primitive = SimplePrimitive | null | undefined;
 export type ExtendedPrimitive =
   | Primitive
   | Record<string | number | symbol, Primitive>;
@@ -18,6 +18,8 @@ export type OptionalNullOrUndefined<T> = Partial<{
 }>;
 
 export type SelfOrArray<T> = T | T[];
+
+export type RecursiveArray<T> = T | RecursiveArray<T>[];
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type Abstract<T> = Function & { prototype: T };
