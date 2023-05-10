@@ -7,6 +7,7 @@ export interface FirestoreNotification extends FirestoreDocumentJson {
   sound?: string;
   title: string;
   payload?: AllowedFirestoreTypes;
+  sentToAll?: boolean;
 }
 
 export function isFirestoreNotification(notification?: object): notification is FirestoreNotification {
@@ -15,7 +16,7 @@ export function isFirestoreNotification(notification?: object): notification is 
   }
 
   const {
-    body, payload, sendTime, sound, title
+    body, payload, sendTime, sound, title, sentToAll
   } = notification as Partial<FirestoreNotification>;
 
   // Check that all required fields are present and of the correct type
@@ -42,6 +43,10 @@ export function isFirestoreNotification(notification?: object): notification is 
   }
 
   if (payload != null && typeof payload !== "object") {
+    return false;
+  }
+
+  if (sentToAll != null && typeof sentToAll !== "boolean") {
     return false;
   }
 
