@@ -1,10 +1,10 @@
 export type SimplePrimitive = string | number | boolean;
 export type Primitive = SimplePrimitive | null | undefined;
-export type ExtendedPrimitive =
+export type ShallowPrimitiveObject =
   | Primitive
   | Record<string | number | symbol, Primitive>;
-export interface RecursivePrimitive {
-  [key: string | number | symbol]: RecursivePrimitive | ExtendedPrimitive;
+export interface PrimitiveObject {
+  [key: string | number | symbol]: PrimitiveObject | Primitive;
 }
 export type RecursivePartial<T> = {
   [P in keyof T]?: T[P] extends (infer U)[]

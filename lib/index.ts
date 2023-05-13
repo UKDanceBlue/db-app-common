@@ -1,6 +1,6 @@
+import "reflect-metadata";
+
 export * from "./util/TypeUtils.js";
-export * from "./api/response/responseCreators.js";
-export * from "./api/response/responseTypes.js";
 export * from "./api/request/BodyTypes.js";
 export * from "./api/request/ListQueryTypes.js";
 export * from "./api/request/SearchTypes.js";
@@ -11,7 +11,6 @@ export * from "./auth/index.js";
 
 export * from "./util/comparators.js";
 
-export { DeviceResource } from "./api/resource/Device.js";
 export { ConfigurationResource } from "./api/resource/Configuration.js";
 export { EventResource } from "./api/resource/Event.js";
 export { ImageResource } from "./api/resource/Image.js";

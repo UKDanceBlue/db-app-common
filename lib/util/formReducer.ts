@@ -1,7 +1,7 @@
-import type { ExtendedPrimitive } from "./TypeUtils.js";
+import type { PrimitiveObject } from "./TypeUtils.js";
 import { getReact } from "./reactLib.js";
 
-type FormMap = Map<string | number | symbol, ExtendedPrimitive>;
+type FormMap = Map<string | number | symbol, PrimitiveObject>;
 
 export type UpdatePayload<T> = T extends Map<infer k, infer V> ? [k, V] : never;
 

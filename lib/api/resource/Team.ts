@@ -8,18 +8,18 @@ export enum TeamType {
   Morale = "Morale",
 }
 
-export interface TeamResource {
-  teamId: string;
+export class TeamResource {
+  teamId!: string;
 
-  name: string;
+  name!: string;
 
-  type: TeamType;
+  type!: TeamType;
 
-  visibility: DbRole;
+  visibility!: DbRole;
 
-  members: PersonResource[] | string[];
+  members!: PersonResource[] | string[];
 
-  captains: PersonResource[] | string[];
+  captains!: PersonResource[] | string[];
 
-  pointEntries: PointEntryResource[] | string[];
+  pointEntries!: PointEntryResource[] | string[];
 }
