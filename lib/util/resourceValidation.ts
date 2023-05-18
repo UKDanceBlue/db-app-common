@@ -112,6 +112,10 @@ interface CheckTypeOptions {
  * As a special case, NaN is checked against "number" and will be rejected.
  * Object will also reject null and undefined, unless the options allow them.
  *
+ * TODO convert most uses of this to a wrapper function that receives a full object and a key name
+ * and calls this function with the value of that key. This will allow us to have more helpful
+ * error handling.
+ *
  * @param type The type to check against.
  * @param value The value to check.
  * @param array An array to push a new `ValidationError` to if the value is not of the given type.
@@ -155,138 +159,131 @@ export function checkType(
         isArray: false,
       })
     );
-  } else {
-    // Decide if we need to do a custom check or if we can just use typeof.
-    // Get the first character code of the type.
-    const firstCharCode = type.codePointAt(0);
-    if (!firstCharCode) {
-      // This should never happen.
-      throw new Error(`Invalid type: "${type}"`);
+  }
+  // Decide if we need to do a custom check or if we can just use typeof.
+  // If the first character is lowercase, it's a typeof check.
+  // eslint-disable-next-line @typescript-eslint/prefer-string-starts-ends-with
+  else if (type[0] === type[0]?.toLowerCase()) {
+    // typeof check
+    if (typeof value !== type) {
+      const error = new TypeMismatchError(type, actualTypeForError);
+      array.push(error);
+      return false;
     }
 
-    // If the first character is not a capital letter, use typeof.
-    if (firstCharCode >= 65 && firstCharCode <= 90) {
-      // typeof check
-      if (typeof value !== type) {
-        const error = new TypeMismatchError(type, actualTypeForError);
-        array.push(error);
-        return false;
+    // Special check for number
+    if (type === "number" && Number.isNaN(value)) {
+      const error = new NaNError();
+      array.push(error);
+      return false;
+    }
+
+    // Special check for object
+    if (type === "object" && value === null) {
+      const error = new TypeMismatchError(type, "null");
+      array.push(error);
+      return false;
+    }
+  } else {
+    switch (type as CustomTypeNames) {
+      // Use instanceof for Date.
+      case "Class": {
+        if (!options.classToCheck) {
+          throw new Error(
+            `No class provided for "Class" type in checkType options`
+          );
+        }
+        if (!(value instanceof options.classToCheck)) {
+          const error = new TypeMismatchError(
+            options.classToCheck.name,
+            actualTypeForError
+          );
+          array.push(error);
+          return false;
+        }
+        break;
       }
 
-      // Special check for number
-      if (type === "number" && Number.isNaN(value)) {
-        const error = new NaNError();
-        array.push(error);
-        return false;
+      // Check that the value is a key of the enum.
+      case "Enum": {
+        if (!options.enumToCheck) {
+          throw new Error(
+            `No enum provided for "Enum" type in checkType options`
+          );
+        }
+        const enumValues = Object.values(options.enumToCheck);
+        if (!enumValues.includes(value)) {
+          const error = new TypeMismatchError(
+            `Enum<${Object.keys(options.enumToCheck).join(" | ")}>`,
+            actualTypeForError
+          );
+          array.push(error);
+
+          return false;
+        }
+        break;
       }
 
-      // Special check for object
-      if (type === "object" && value === null) {
-        const error = new TypeMismatchError(type, "null");
-        array.push(error);
-        return false;
+      // Luxon has built-in type guards for these types.
+      case "Duration": {
+        if (!Duration.isDuration(value)) {
+          const error = new TypeMismatchError(type, actualTypeForError);
+          array.push(error);
+          return false;
+        }
+        break;
       }
-    } else {
-      switch (type as CustomTypeNames) {
-        // Use instanceof for Date.
-        case "Class": {
-          if (!options.classToCheck) {
-            throw new Error(
-              `No class provided for "Class" type in checkType options`
-            );
-          }
-          if (!(value instanceof options.classToCheck)) {
-            const error = new TypeMismatchError(
-              options.classToCheck.name,
-              actualTypeForError
-            );
-            array.push(error);
-            return false;
-          }
-          break;
+      case "DateTime": {
+        if (!DateTime.isDateTime(value)) {
+          const error = new TypeMismatchError(type, actualTypeForError);
+          array.push(error);
+          return false;
+        }
+        break;
+      }
+      case "Interval": {
+        if (!Interval.isInterval(value)) {
+          const error = new TypeMismatchError(type, actualTypeForError);
+          array.push(error);
+          return false;
+        }
+        break;
+      }
+
+      // Any resource should be an instance of Resource, if it is we can validate it.
+      case "Resource": {
+        if (!options.classToCheck) {
+          throw new Error(
+            `No class provided for "Resource" type in checkType options`
+          );
         }
 
-        // Check that the value is a key of the enum.
-        case "Enum": {
-          if (!options.enumToCheck) {
-            throw new Error(
-              `No enum provided for "Enum" type in checkType options`
-            );
-          }
-          const enumValues = Object.values(options.enumToCheck);
-          if (!enumValues.includes(value)) {
-            const error = new TypeMismatchError(
-              `Enum<${Object.keys(options.enumToCheck).join(" | ")}>`,
-              actualTypeForError
-            );
-            array.push(error);
-
+        if (!(value instanceof Resource)) {
+          const error = new TypeMismatchError("Resource", actualTypeForError);
+          array.push(error);
+          return false;
+        } else if (!(value instanceof options.classToCheck)) {
+          const error = new TypeMismatchError(
+            options.classToCheck.name,
+            actualTypeForError
+          );
+          array.push(error);
+          return false;
+        } else {
+          const errors = value.validateSelf();
+          if (errors.length > 0) {
+            array.push(...errors);
             return false;
           }
-          break;
         }
-
-        // Luxon has built-in type guards for these types.
-        case "Duration": {
-          if (!Duration.isDuration(value)) {
-            const error = new TypeMismatchError(type, actualTypeForError);
-            array.push(error);
-            return false;
-          }
-          break;
-        }
-        case "DateTime": {
-          if (!DateTime.isDateTime(value)) {
-            const error = new TypeMismatchError(type, actualTypeForError);
-            array.push(error);
-            return false;
-          }
-          break;
-        }
-        case "Interval": {
-          if (!Interval.isInterval(value)) {
-            const error = new TypeMismatchError(type, actualTypeForError);
-            array.push(error);
-            return false;
-          }
-          break;
-        }
-
-        // Any resource should be an instance of Resource, if it is we can validate it.
-        case "Resource": {
-          if (!options.classToCheck) {
-            throw new Error(
-              `No class provided for "Resource" type in checkType options`
-            );
-          }
-
-          if (!(value instanceof Resource)) {
-            const error = new TypeMismatchError("Resource", actualTypeForError);
-            array.push(error);
-            return false;
-          } else if (!(value instanceof options.classToCheck)) {
-            const error = new TypeMismatchError(
-              options.classToCheck.name,
-              actualTypeForError
-            );
-            array.push(error);
-            return false;
-          } else {
-            const errors = value.validateSelf();
-            if (errors.length > 0) {
-              array.push(...errors);
-              return false;
-            }
-          }
-          break;
-        }
-        case "ANY": {
-          // ANY is a special type that matches any value, do nothing.
-          break;
-        }
-        default: {
-          throw new Error(`Invalid type passed to checkType: "${type}"`);
-        }
+        break;
+      }
+      case "ANY": {
+        // ANY is a special type that matches any value, do nothing.
+        break;
+      }
+      default: {
+        throw new Error(`Invalid type passed to checkType: "${type}"`);
       }
     }
   }

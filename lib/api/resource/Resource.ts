@@ -1,6 +1,6 @@
 import { instanceToPlain, plainToInstance } from "class-transformer";
 
-import type { PrimitiveObject } from "../../index.js";
+import type { PrimitiveObject } from "../../util/TypeUtils.js";
 import type { ValidationError } from "../../util/resourceValidation.js";
 
 export abstract class Resource {
@@ -33,8 +33,7 @@ export abstract class Resource {
   validateSelfOrThrow(): void {
     const errors = this.validateSelf();
     if (errors.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-throw-literal
-      throw errors[0];
+      throw errors[0] ?? new Error("Unknown error.");
     }
   }
 
@@ -100,4 +99,25 @@ export abstract class Resource {
     });
     return [instances, errors];
   }
+}
+
+export interface ResourceStatic<Self extends Resource> {
+  serializeArray<T extends Self>(instances: T[]): PrimitiveObject[];
+  deserialize<V extends PrimitiveObject, T extends Self>(
+    this: new () => T,
+    plain: V
+  ): [T, ValidationError[]];
+  deserializeArray<V extends PrimitiveObject, T extends Self>(
+    this: new () => T,
+    plain: V[]
+  ): [T[], ValidationError[]];
+}
+
+Resource satisfies ResourceStatic<Resource>;
+
+export interface ResourceConstructor<R extends Resource> {
+  new (...args: never[]): R;
+  serializeArray: (instances: R[]) => PrimitiveObject[];
+  deserialize: (plain: PrimitiveObject) => [R, ValidationError[]];
+  deserializeArray: (plain: PrimitiveObject[]) => [R[], ValidationError[]];
 }

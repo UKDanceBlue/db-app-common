@@ -6,6 +6,51 @@ export type ShallowPrimitiveObject =
 export interface PrimitiveObject {
   [key: string | number | symbol]: PrimitiveObject | Primitive;
 }
+
+export function isPrimitive(value: unknown): value is Primitive {
+  return (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean" ||
+    value === null ||
+    value === undefined
+  );
+}
+
+function isPrimitiveObjectRecurse(
+  value: unknown
+): value is PrimitiveObject | Primitive {
+  if (isPrimitive(value)) {
+    return true;
+  } else if (typeof value === "object" && value !== null) {
+    for (const key in value) {
+      if (
+        !isPrimitiveObjectRecurse((value as Record<typeof key, unknown>)[key])
+      ) {
+        return false;
+      }
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export function isPrimitiveObject(value: unknown): value is PrimitiveObject {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  } else {
+    for (const key in value) {
+      if (
+        !isPrimitiveObjectRecurse((value as Record<typeof key, unknown>)[key])
+      ) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 export type RecursivePartial<T> = {
   [P in keyof T]?: T[P] extends (infer U)[]
     ? RecursivePartial<U>[]

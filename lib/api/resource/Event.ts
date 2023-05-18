@@ -1,9 +1,11 @@
+import { Type } from "class-transformer";
 import type { DateTime, Duration } from "luxon";
 
 import type { ValidationError } from "../../util/resourceValidation.js";
 import { checkType, checkUnion } from "../../util/resourceValidation.js";
 
 import { ImageResource } from "./Image.js";
+import type { ResourceConstructor } from "./Resource.js";
 import { Resource } from "./Resource.js";
 
 export class EventResource extends Resource {
@@ -87,3 +89,5 @@ export interface EventResourceInitializer {
   description?: EventResource["description"];
   location?: EventResource["location"];
 }
+
+EventResource satisfies ResourceConstructor<EventResource>;

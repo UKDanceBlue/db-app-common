@@ -82,8 +82,10 @@ export interface FilterOptions<Resource extends object> {
    * A list of filters to apply to the request, this will search
    * the database for only the resources that match the filters.
    */
-  filter?: Record<
-    keyof Resource & string,
-    FilterItem<Resource, keyof Resource & string>[]
+  filter?: Partial<
+    Record<
+      keyof Resource & string,
+      FilterItem<Resource, keyof Resource & string>[]
+    >
   >;
 }

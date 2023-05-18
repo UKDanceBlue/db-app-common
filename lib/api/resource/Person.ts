@@ -1,4 +1,6 @@
+import type { UserData } from "../../auth/index.js";
 import { AuthSource } from "../../auth/index.js";
+import { roleToAuthorization } from "../../auth/role.js";
 import type { ValidationError } from "../../util/resourceValidation.js";
 import { checkType, checkUnion } from "../../util/resourceValidation.js";
 
@@ -51,6 +53,20 @@ export class PersonResource extends Resource {
     this.memberOf = memberOf ?? [];
     this.captainOf = captainOf ?? [];
     this.pointEntries = pointEntries ?? [];
+  }
+
+  toUserData(): UserData {
+    const userData: UserData = {
+      userId: this.userId,
+      auth: roleToAuthorization(this.role),
+    };
+    userData.teamIds = this.memberOf.map((team) =>
+      typeof team === "string" ? team : team.teamId
+    );
+    userData.captainOfTeamIds = this.captainOf.map((team) =>
+      typeof team === "string" ? team : team.teamId
+    );
+    return userData;
   }
 
   validateSelf(): ValidationError[] {

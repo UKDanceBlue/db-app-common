@@ -11,16 +11,49 @@ export * from "./auth/index.js";
 
 export * from "./util/comparators.js";
 
-export { ConfigurationResource } from "./api/resource/Configuration.js";
-export { EventResource } from "./api/resource/Event.js";
-export { ImageResource } from "./api/resource/Image.js";
-export { LoginFlowSessionResource } from "./api/resource/LoginFlowSession.js";
-export { NotificationResource } from "./api/resource/Notification.js";
-export { PersonResource } from "./api/resource/Person.js";
-export { PointEntryResource } from "./api/resource/PointEntry.js";
-export { PointOpportunityResource } from "./api/resource/PointOpportunity.js";
-export { RoleResource } from "./api/resource/Role.js";
-export { TeamResource, TeamType } from "./api/resource/Team.js";
+export * from "./api/response/JsonResponse.js";
+
+export { Resource as ApiResource } from "./api/resource/Resource.js";
+export {
+  ConfigurationResource,
+  ConfigurationResourceInitializer,
+} from "./api/resource/Configuration.js";
+export {
+  EventResource,
+  EventResourceInitializer,
+} from "./api/resource/Event.js";
+export {
+  ImageResource,
+  ImageResourceInitializer,
+} from "./api/resource/Image.js";
+export {
+  LoginFlowSessionResource,
+  LoginFlowSessionResourceInitializer,
+} from "./api/resource/LoginFlowSession.js";
+export {
+  NotificationResource,
+  NotificationResourceInitializer,
+} from "./api/resource/Notification.js";
+export {
+  PersonResource,
+  PersonResourceInitializer,
+} from "./api/resource/Person.js";
+export {
+  PointEntryResource,
+  PointEntryResourceInitializer,
+} from "./api/resource/PointEntry.js";
+export {
+  PointOpportunityResource,
+  PointOpportunityResourceInitializer,
+} from "./api/resource/PointOpportunity.js";
+export { RoleResource, RoleResourceInitializer } from "./api/resource/Role.js";
+export {
+  TeamResource,
+  TeamType,
+  TeamResourceInitializer,
+} from "./api/resource/Team.js";
+
+export { ApiClient } from "./client/ApiClient.js";
 
 // React specific code:
 export * from "./util/formReducer.js";
