@@ -1,6 +1,7 @@
 import type {
+  PlainResourceObject,
   Resource,
-  ResourceConstructor,
+  ResourceStatic,
 } from "../api/resource/Resource.js";
 import type {
   ApiError,
@@ -101,9 +102,12 @@ export interface DeserializedResourceApiResponse<R extends Resource>
   resource: R | undefined;
 }
 
-export function deserializeResourceApiResponse<R extends Resource>(
+export function deserializeResourceApiResponse<
+  R extends Resource,
+  P extends PlainResourceObject<R>
+>(
   apiResponse: OkApiResponse,
-  resourceClass: ResourceConstructor<R>
+  resourceClass: ResourceStatic<R, P>
 ): DeserializedResourceApiResponse<R> {
   if (!apiResponse.data) {
     return {
@@ -112,7 +116,10 @@ export function deserializeResourceApiResponse<R extends Resource>(
     };
   }
 
-  const [deserialized, errors] = resourceClass.deserialize(apiResponse.data);
+  const [deserialized, errors] = resourceClass.deserialize(
+    // TODO get rid of this cast, there should be a low-overhead way to do this correctly (I want to avoid having to do a full type check)
+    apiResponse.data as P
+  );
   if (errors.length > 0) {
     throw new DeserializationError("Failed to deserialize event.", errors[0]);
   }
@@ -128,9 +135,12 @@ export interface DeserializedArrayApiResponse<R extends Resource>
   resources: R[] | undefined;
 }
 
-export function deserializeArrayApiResponse<R extends Resource>(
+export function deserializeArrayApiResponse<
+  R extends Resource,
+  P extends PlainResourceObject<R>
+>(
   apiResponse: OkApiResponse<PrimitiveObject[]>,
-  resourceClass: ResourceConstructor<R>
+  resourceClass: ResourceStatic<R, P>
 ): DeserializedArrayApiResponse<R> {
   if (!apiResponse.data) {
     return {
@@ -140,7 +150,8 @@ export function deserializeArrayApiResponse<R extends Resource>(
   }
 
   const [deserialized, errors] = resourceClass.deserializeArray(
-    apiResponse.data
+    // TODO get rid of this cast, there should be a low-overhead way to do this correctly (I want to avoid having to do a full type check)
+    apiResponse.data as P[]
   );
   if (errors.length > 0) {
     throw new DeserializationError("Failed to deserialize event.", errors[0]);
@@ -159,17 +170,26 @@ function isApiResponseArray<T extends PrimitiveObject>(
 }
 
 // Function that takes an OkApiResponse<PrimitiveObject> or OkApiResponse<PrimitiveObject[]> and returns a DeserializedOkApiResponse or DeserializedArrayApiResponse.
-export function deserializeOkApiResponse<R extends Resource>(
+export function deserializeOkApiResponse<
+  R extends Resource,
+  P extends PlainResourceObject<R>
+>(
   apiResponse: OkApiResponse,
-  resourceClass: ResourceConstructor<R>
+  resourceClass: ResourceStatic<R, P>
 ): DeserializedResourceApiResponse<R>;
-export function deserializeOkApiResponse<R extends Resource>(
+export function deserializeOkApiResponse<
+  R extends Resource,
+  P extends PlainResourceObject<R>
+>(
   apiResponse: OkApiResponse<PrimitiveObject[]>,
-  resourceClass: ResourceConstructor<R>
+  resourceClass: ResourceStatic<R, P>
 ): DeserializedArrayApiResponse<R>;
-export function deserializeOkApiResponse<R extends Resource>(
+export function deserializeOkApiResponse<
+  R extends Resource,
+  P extends PlainResourceObject<R>
+>(
   apiResponse: OkApiResponse | OkApiResponse<PrimitiveObject[]>,
-  resourceClass: ResourceConstructor<R>
+  resourceClass: ResourceStatic<R, P>
 ): DeserializedResourceApiResponse<R> | DeserializedArrayApiResponse<R> {
   return isApiResponseArray(apiResponse)
     ? deserializeArrayApiResponse(apiResponse, resourceClass)
@@ -181,9 +201,12 @@ export interface DeserializedCreatedApiResponse<R extends Resource>
   createdResourceId: string;
 }
 
-export function deserializeCreatedApiResponse<R extends Resource>(
+export function deserializeCreatedApiResponse<
+  R extends Resource,
+  P extends PlainResourceObject<R>
+>(
   apiResponse: CreatedApiResponse,
-  resourceClass: ResourceConstructor<R>
+  resourceClass: ResourceStatic<R, P>
 ): DeserializedCreatedApiResponse<R> {
   const deserialized = deserializeResourceApiResponse(
     apiResponse,
@@ -199,9 +222,12 @@ export interface DeserializedPaginatedApiResponse<R extends Resource>
   extends DeserializedArrayApiResponse<R>,
     PaginationInfo {}
 
-export function deserializePaginatedApiResponse<R extends Resource>(
+export function deserializePaginatedApiResponse<
+  R extends Resource,
+  P extends PlainResourceObject<R>
+>(
   apiResponse: PaginatedApiResponse,
-  resourceClass: ResourceConstructor<R>
+  resourceClass: ResourceStatic<R, P>
 ): DeserializedPaginatedApiResponse<R> {
   const deserialized = deserializeArrayApiResponse(apiResponse, resourceClass);
   return {

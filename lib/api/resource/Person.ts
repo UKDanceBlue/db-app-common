@@ -1,12 +1,17 @@
 import type { UserData } from "../../auth/index.js";
 import { AuthSource } from "../../auth/index.js";
 import { roleToAuthorization } from "../../auth/role.js";
+import { isArrayOf } from "../../index.js";
 import type { ValidationError } from "../../util/resourceValidation.js";
 import { checkType, checkUnion } from "../../util/resourceValidation.js";
 
+import type { PlainPointEntry } from "./PointEntry.js";
 import { PointEntryResource } from "./PointEntry.js";
+import type { PlainResourceObject, ResourceStatic } from "./Resource.js";
 import { Resource } from "./Resource.js";
+import type { PlainRole } from "./Role.js";
 import { RoleResource } from "./Role.js";
+import type { PlainTeam } from "./Team.js";
 import { TeamResource } from "./Team.js";
 
 export class PersonResource extends Resource {
@@ -148,6 +153,68 @@ export class PersonResource extends Resource {
     );
     return errors;
   }
+
+  public toPlain(): PlainPerson {
+    const memberOf = isArrayOf(this.memberOf, "string")
+      ? this.memberOf
+      : this.memberOf.map((i) => i.toPlain());
+    const captainOf = isArrayOf(this.captainOf, "string")
+      ? this.captainOf
+      : this.captainOf.map((i) => i.toPlain());
+    const pointEntries = isArrayOf(this.pointEntries, "string")
+      ? this.pointEntries
+      : this.pointEntries.map((i) => i.toPlain());
+    return {
+      userId: this.userId,
+      authIds: this.authIds,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      email: this.email,
+      linkblue: this.linkblue,
+      role: this.role.toPlain(),
+      memberOf,
+      captainOf,
+      pointEntries,
+    };
+  }
+
+  public static fromPlain(plain: PlainPerson): PersonResource {
+    const memberOf = isArrayOf(plain.memberOf, "string")
+      ? plain.memberOf
+      : plain.memberOf.map((i) => TeamResource.fromPlain(i));
+    const captainOf = isArrayOf(plain.captainOf, "string")
+      ? plain.captainOf
+      : plain.captainOf.map((i) => TeamResource.fromPlain(i));
+    const pointEntries = isArrayOf(plain.pointEntries, "string")
+      ? plain.pointEntries
+      : plain.pointEntries.map((i) => PointEntryResource.fromPlain(i));
+    return new PersonResource({
+      userId: plain.userId,
+      authIds: plain.authIds,
+      firstName: plain.firstName,
+      lastName: plain.lastName,
+      email: plain.email,
+      linkblue: plain.linkblue,
+      role: RoleResource.fromPlain(plain.role),
+      memberOf,
+      captainOf,
+      pointEntries,
+    });
+  }
+}
+
+export interface PlainPerson
+  extends PlainResourceObject<PersonResourceInitializer> {
+  userId: string;
+  authIds: Partial<Record<AuthSource, string>>;
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+  linkblue: string | null;
+  role: PlainRole;
+  memberOf: PlainTeam[] | string[];
+  captainOf: PlainTeam[] | string[];
+  pointEntries: PlainPointEntry[] | string[];
 }
 
 export interface PersonResourceInitializer {
@@ -162,3 +229,5 @@ export interface PersonResourceInitializer {
   captainOf?: PersonResource["captainOf"];
   pointEntries?: PersonResource["pointEntries"];
 }
+
+PersonResource satisfies ResourceStatic<PersonResource, PlainPerson>;

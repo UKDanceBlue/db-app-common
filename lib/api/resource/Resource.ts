@@ -1,6 +1,4 @@
-import { instanceToPlain, plainToInstance } from "class-transformer";
-
-import type { PrimitiveObject } from "../../util/TypeUtils.js";
+import type { ExcludeValues, PrimitiveObject } from "../../util/TypeUtils.js";
 import type { ValidationError } from "../../util/resourceValidation.js";
 
 export abstract class Resource {
@@ -16,7 +14,7 @@ export abstract class Resource {
    * implements it.
    */
   // eslint-disable-next-line class-methods-use-this
-  getUniqueId(): string {
+  public getUniqueId(): string {
     throw new Error(`Method not implemented by subclass.`);
   }
 
@@ -28,26 +26,30 @@ export abstract class Resource {
    *
    * This function does not work as a type guard.
    */
-  abstract validateSelf(): ValidationError[];
+  public abstract validateSelf(): ValidationError[];
 
-  validateSelfOrThrow(): void {
+  public validateSelfOrThrow(): void {
     const errors = this.validateSelf();
     if (errors.length > 0) {
       throw errors[0] ?? new Error("Unknown error.");
     }
   }
 
-  serialize(): PrimitiveObject {
+  public abstract toPlain(): PlainResourceObject<Resource>;
+
+  public serialize(): PrimitiveObject {
     this.validateSelfOrThrow();
-    return instanceToPlain(this);
+    return this.toPlain();
   }
 
-  static serializeArray<T extends Resource>(instances: T[]): PrimitiveObject[] {
+  public static serializeArray<T extends Resource>(
+    instances: T[]
+  ): PrimitiveObject[] {
     const errors: ValidationError[] = [];
     const plain = instances.map((i) => {
       const instanceErrors = i.validateSelf();
       errors.push(...instanceErrors);
-      return instanceToPlain(i);
+      return i.toPlain();
     });
 
     return plain;
@@ -60,15 +62,24 @@ export abstract class Resource {
    * in one step.
    *
    * @param this The resource class to deserialize into.
+   * @param this.fromPlain A function that takes a plain object and returns
+   * an instance of the resource class, said instance is allowed to be invalid.
    * @param plain The plain object to deserialize (must be a primitive object).
    * @return A tuple containing the deserialized instance and any validation
    * errors.
    */
-  static deserialize<V extends PrimitiveObject, T extends Resource>(
-    this: new () => T,
+  public static deserialize<
+    V extends PlainResourceObject<R>,
+    I,
+    R extends Resource
+  >(
+    this: {
+      new (initializer: I): R;
+      fromPlain: ResourceStatic<R, PlainResourceObject<R>>["fromPlain"];
+    },
     plain: V
-  ): [T, ValidationError[]] {
-    const instance = plainToInstance(this, plain);
+  ): [R, ValidationError[]] {
+    const instance = this.fromPlain(plain);
     const errors = instance.validateSelf();
     return [instance, errors];
   }
@@ -82,17 +93,26 @@ export abstract class Resource {
    * array.
    *
    * @param this The resource class to deserialize into.
+   * @param this.fromPlain A function that takes a plain object and returns
+   * an instance of the resource class, said instance is allowed to be invalid.
    * @param plain The plain objects to deserialize (must be an array of primitive objects).
    * @return A tuple containing the deserialized instances and any validation
    * errors.
    */
-  static deserializeArray<V extends PrimitiveObject, T extends Resource>(
-    this: new () => T,
+  public static deserializeArray<
+    V extends PlainResourceObject<R>,
+    I,
+    R extends Resource
+  >(
+    this: {
+      new (initializer: I): R;
+      fromPlain: ResourceStatic<R, PlainResourceObject<R>>["fromPlain"];
+    },
     plain: V[]
-  ): [T[], ValidationError[]] {
+  ): [R[], ValidationError[]] {
     const errors: ValidationError[] = [];
     const instances = plain.map((p) => {
-      const instance = plainToInstance(this, p);
+      const instance = this.fromPlain(p);
       const instanceErrors = instance.validateSelf();
       errors.push(...instanceErrors);
       return instance;
@@ -101,23 +121,28 @@ export abstract class Resource {
   }
 }
 
-export interface ResourceStatic<Self extends Resource> {
-  serializeArray<T extends Self>(instances: T[]): PrimitiveObject[];
-  deserialize<V extends PrimitiveObject, T extends Self>(
-    this: new () => T,
-    plain: V
-  ): [T, ValidationError[]];
-  deserializeArray<V extends PrimitiveObject, T extends Self>(
-    this: new () => T,
-    plain: V[]
-  ): [T[], ValidationError[]];
-}
+// TODO: there is something funky here, autocomplete is broken and that probably means
+// that the type is wrong somehow
+export type PlainResourceObject<I extends object> = {
+  [key in keyof ExcludeValues<
+    I,
+    /*
+      eslint-disable-next-line @typescript-eslint/ban-types -- We don't care about the lack
+      of safety here because we are excluding the values, in fact the added specificity would
+      allow illegal values to be included.
+      */
+    Function
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  >]: unknown;
+};
 
-Resource satisfies ResourceStatic<Resource>;
-
-export interface ResourceConstructor<R extends Resource> {
+export interface ResourceStatic<
+  R extends Resource,
+  P extends PlainResourceObject<R> = PlainResourceObject<R>
+> {
   new (...args: never[]): R;
+  fromPlain: (plain: P) => R;
   serializeArray: (instances: R[]) => PrimitiveObject[];
-  deserialize: (plain: PrimitiveObject) => [R, ValidationError[]];
-  deserializeArray: (plain: PrimitiveObject[]) => [R[], ValidationError[]];
+  deserialize: (plain: P) => [R, ValidationError[]];
+  deserializeArray: (plain: P[]) => [R[], ValidationError[]];
 }

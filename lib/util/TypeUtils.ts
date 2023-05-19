@@ -1,11 +1,5 @@
 export type SimplePrimitive = string | number | boolean;
 export type Primitive = SimplePrimitive | null | undefined;
-export type ShallowPrimitiveObject =
-  | Primitive
-  | Record<string | number | symbol, Primitive>;
-export interface PrimitiveObject {
-  [key: string | number | symbol]: PrimitiveObject | Primitive;
-}
 
 export function isPrimitive(value: unknown): value is Primitive {
   return (
@@ -16,6 +10,24 @@ export function isPrimitive(value: unknown): value is Primitive {
     value === undefined
   );
 }
+
+export interface PrimitiveObject {
+  [key: string | number | symbol]:
+    | PrimitiveObject
+    | PrimitiveObject[]
+    | Primitive
+    | Primitive[];
+}
+
+/**
+ * A primitive object that only has one level of nesting, but allows for arrays
+ *
+ * @see PrimitiveObject
+ */
+export type ShallowPrimitiveObject =
+  | Primitive
+  | Primitive[]
+  | Record<string | number | symbol, Primitive | Primitive[]>;
 
 function isPrimitiveObjectRecurse(
   value: unknown
@@ -51,6 +63,41 @@ export function isPrimitiveObject(value: unknown): value is PrimitiveObject {
   return true;
 }
 
+/**
+ * This is a list of all the type strings produced by `typeof` that we allow in checkType.
+ * All values are lowercase.
+ *
+ * function is not included because it is deceptive and doesn't tell you
+ * very much about the type of the value.
+ */
+export type TypeOfTypeNames =
+  | "undefined"
+  | "object"
+  | "boolean"
+  | "number"
+  | "bigint"
+  | "string"
+  | "symbol";
+
+/**
+ * This type maps typeof strings to their corresponding types.
+ */
+export type TypeOfMap<T extends TypeOfTypeNames> = T extends "undefined"
+  ? undefined
+  : T extends "object"
+  ? object
+  : T extends "boolean"
+  ? boolean
+  : T extends "number"
+  ? number
+  : T extends "bigint"
+  ? bigint
+  : T extends "string"
+  ? string
+  : T extends "symbol"
+  ? symbol
+  : never;
+
 export type RecursivePartial<T> = {
   [P in keyof T]?: T[P] extends (infer U)[]
     ? RecursivePartial<U>[]
@@ -78,6 +125,21 @@ export type OptionalToNullable<T> = T extends object
   : T extends NonNullable<T>
   ? T
   : T | null;
+
+export type OmitNever<T> = {
+  [K in keyof T as T[K] extends never ? never : K]: T[K];
+};
+
+export type ExcludeValues<T extends object, V> = OmitNever<{
+  [K in keyof T]: Exclude<T[K], V>;
+}>;
+
+export function isArrayOf<TypeName extends TypeOfTypeNames>(
+  value: TypeOfMap<TypeName>[] | unknown[],
+  type: TypeName
+): value is TypeOfMap<TypeName>[] {
+  return typeof value[0] === type;
+}
 
 export enum Comparator {
   EQUALS = "eq",

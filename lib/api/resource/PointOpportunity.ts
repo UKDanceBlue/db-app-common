@@ -1,12 +1,14 @@
-import type { DateTime } from "luxon";
+import { DateTime } from "luxon";
 
 import type { ValidationError } from "../../util/resourceValidation.js";
 import { checkType } from "../../util/resourceValidation.js";
 
-import type { PersonResource } from "./Person.js";
+import type { PlainPerson } from "./Person.js";
+import { PersonResource } from "./Person.js";
+import type { PlainResourceObject, ResourceStatic } from "./Resource.js";
 import { Resource } from "./Resource.js";
-import type { TeamResource } from "./Team.js";
-import { TeamType } from "./Team.js";
+import type { PlainTeam } from "./Team.js";
+import { TeamResource, TeamType } from "./Team.js";
 export class PointOpportunityResource extends Resource {
   entryId!: string;
 
@@ -46,6 +48,64 @@ export class PointOpportunityResource extends Resource {
     checkType("string", this.name, errors);
     return errors;
   }
+
+  public toPlain(): PlainPointOpportunity {
+    let personFrom: PlainPerson | string | null = null;
+    if (this.personFrom != null) {
+      personFrom =
+        typeof this.personFrom === "string"
+          ? this.personFrom
+          : this.personFrom.toPlain();
+    }
+    const team =
+      typeof this.team === "string" ? this.team : this.team.toPlain();
+
+    return {
+      entryId: this.entryId,
+      type: this.type,
+      name: this.name,
+      opportunityDate: this.opportunityDate?.toISO() ?? null,
+      personFrom,
+      team,
+    };
+  }
+
+  public static fromPlain(
+    plain: PlainPointOpportunity
+  ): PointOpportunityResource {
+    let personFrom: PersonResource | string | null = null;
+    if (plain.personFrom != null) {
+      personFrom =
+        typeof plain.personFrom === "string"
+          ? plain.personFrom
+          : PersonResource.fromPlain(plain.personFrom);
+    }
+    const team =
+      typeof plain.team === "string"
+        ? plain.team
+        : TeamResource.fromPlain(plain.team);
+    return new PointOpportunityResource({
+      entryId: plain.entryId,
+      type: plain.type,
+      name: plain.name,
+      opportunityDate:
+        plain.opportunityDate == null
+          ? null
+          : DateTime.fromISO(plain.opportunityDate),
+      personFrom,
+      team,
+    });
+  }
+}
+
+export interface PlainPointOpportunity
+  extends PlainResourceObject<PointOpportunityResourceInitializer> {
+  entryId: string;
+  type: TeamType;
+  name: string;
+  opportunityDate: string | null;
+  personFrom: PlainPerson | string | null;
+  team: PlainTeam | string;
 }
 
 export interface PointOpportunityResourceInitializer {
@@ -56,3 +116,8 @@ export interface PointOpportunityResourceInitializer {
   personFrom?: PointOpportunityResource["personFrom"];
   team: PointOpportunityResource["team"];
 }
+
+PointOpportunityResource satisfies ResourceStatic<
+  PointOpportunityResource,
+  PlainPointOpportunity
+>;

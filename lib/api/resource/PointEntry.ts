@@ -1,10 +1,12 @@
 import type { ValidationError } from "../../util/resourceValidation.js";
 import { checkType } from "../../util/resourceValidation.js";
 
-import type { PersonResource } from "./Person.js";
+import type { PlainPerson } from "./Person.js";
+import { PersonResource } from "./Person.js";
+import type { PlainResourceObject, ResourceStatic } from "./Resource.js";
 import { Resource } from "./Resource.js";
-import type { TeamResource } from "./Team.js";
-import { TeamType } from "./Team.js";
+import type { PlainTeam } from "./Team.js";
+import { TeamResource, TeamType } from "./Team.js";
 export class PointEntryResource extends Resource {
   entryId!: string;
 
@@ -45,6 +47,52 @@ export class PointEntryResource extends Resource {
     checkType("number", this.points, errors);
     return errors;
   }
+
+  public toPlain(): PlainPointEntry {
+    return {
+      entryId: this.entryId,
+      type: this.type,
+      comment: this.comment,
+      points: this.points,
+      personFrom:
+        typeof this.personFrom === "string"
+          ? this.personFrom
+          : this.personFrom?.toPlain() ?? null,
+      team: typeof this.team === "string" ? this.team : this.team.toPlain(),
+    };
+  }
+
+  public static fromPlain(plain: PlainPointEntry): PointEntryResource {
+    let personFrom: PersonResource | string | null = null;
+    if (plain.personFrom !== null) {
+      personFrom =
+        typeof plain.personFrom === "string"
+          ? plain.personFrom
+          : PersonResource.fromPlain(plain.personFrom);
+    }
+    const team =
+      typeof plain.team === "string"
+        ? plain.team
+        : TeamResource.fromPlain(plain.team);
+    return new PointEntryResource({
+      entryId: plain.entryId,
+      type: plain.type,
+      comment: plain.comment,
+      points: plain.points,
+      personFrom,
+      team,
+    });
+  }
+}
+
+export interface PlainPointEntry
+  extends PlainResourceObject<PointEntryResourceInitializer> {
+  entryId: string;
+  type: TeamType;
+  comment: string;
+  points: number;
+  personFrom: PlainPerson | string | null;
+  team: PlainTeam | string;
 }
 
 export interface PointEntryResourceInitializer {
@@ -55,3 +103,8 @@ export interface PointEntryResourceInitializer {
   personFrom: PointEntryResource["personFrom"];
   team: PointEntryResource["team"];
 }
+
+PointEntryResource satisfies ResourceStatic<
+  PointEntryResource,
+  PlainPointEntry
+>;

@@ -1,11 +1,15 @@
-import { Type } from "class-transformer";
-import type { DateTime, Duration } from "luxon";
+import { DateTime, Duration } from "luxon";
 
-import type { ValidationError } from "../../util/resourceValidation.js";
-import { checkType, checkUnion } from "../../util/resourceValidation.js";
+import { isArrayOf } from "../../index.js";
+import {
+  ValidationError,
+  checkType,
+  checkUnion,
+} from "../../util/resourceValidation.js";
 
+import type { PlainImage } from "./Image.js";
 import { ImageResource } from "./Image.js";
-import type { ResourceConstructor } from "./Resource.js";
+import type { PlainResourceObject, ResourceStatic } from "./Resource.js";
 import { Resource } from "./Resource.js";
 
 export class EventResource extends Resource {
@@ -69,14 +73,88 @@ export class EventResource extends Resource {
       errors,
       { allowNull: true }
     );
-    checkType("DateTime", this.occurrences, errors, { isArray: true });
-    checkType("Duration", this.duration, errors, { allowNull: true });
+    const isDateTimeArray = checkType("DateTime", this.occurrences, errors, {
+      isArray: true,
+    });
+    if (isDateTimeArray) {
+      if (this.occurrences.length === 0) {
+        errors.push(new ValidationError("occurrences is empty."));
+      }
+      if (this.occurrences.some((o) => !o.isValid)) {
+        errors.push(new ValidationError("occurrences contains invalid dates."));
+      }
+    }
+    const isDuration = checkType("Duration", this.duration, errors, {
+      allowNull: true,
+    });
+    if (isDuration && this.duration != null) {
+      if (!this.duration.isValid) {
+        errors.push(new ValidationError("duration is invalid."));
+      }
+      if (this.duration.as("milliseconds") < 0) {
+        errors.push(new ValidationError("duration cannot be negative."));
+      }
+    }
     checkType("string", this.title, errors);
     checkType("string", this.summary, errors, { allowNull: true });
     checkType("string", this.description, errors, { allowNull: true });
     checkType("string", this.location, errors, { allowNull: true });
     return errors;
   }
+
+  public toPlain(): PlainEvent {
+    let images: string[] | PlainImage[] | null = null;
+    if (this.images != null) {
+      images = isArrayOf(this.images, "string")
+        ? this.images
+        : this.images.map((i) => i.toPlain());
+    }
+
+    return {
+      eventId: this.eventId,
+      images,
+      occurrences: this.occurrences
+        .map((o) => o.toISO())
+        .filter((o): o is NonNullable<typeof o> => o != null),
+      duration: this.duration?.toISO() ?? null,
+      title: this.title,
+      summary: this.summary,
+      description: this.description,
+      location: this.location,
+    };
+  }
+
+  public static fromPlain(plain: PlainEvent): EventResource {
+    let images: ImageResource[] | string[] | null = null;
+    if (plain.images != null) {
+      images = isArrayOf(plain.images, "string")
+        ? plain.images
+        : plain.images.map((i) => ImageResource.fromPlain(i));
+    }
+
+    return new EventResource({
+      eventId: plain.eventId,
+      images,
+      occurrences: plain.occurrences.map((o) => DateTime.fromISO(o)),
+      duration: plain.duration ? Duration.fromISO(plain.duration) : null,
+      title: plain.title,
+      summary: plain.summary,
+      description: plain.description,
+      location: plain.location,
+    });
+  }
+}
+
+export interface PlainEvent
+  extends PlainResourceObject<EventResourceInitializer> {
+  eventId: string;
+  images: string[] | PlainImage[] | null;
+  occurrences: string[];
+  duration: string | null;
+  title: string;
+  summary: string | null;
+  description: string | null;
+  location: string | null;
 }
 
 export interface EventResourceInitializer {
@@ -90,4 +168,4 @@ export interface EventResourceInitializer {
   location?: EventResource["location"];
 }
 
-EventResource satisfies ResourceConstructor<EventResource>;
+EventResource satisfies ResourceStatic<EventResource, PlainEvent>;

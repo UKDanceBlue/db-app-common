@@ -2,7 +2,7 @@ import { DateTime, Duration, Interval } from "luxon";
 
 import { Resource } from "../api/resource/Resource.js";
 
-import type { Class, Constructor } from "./TypeUtils.js";
+import type { Class, Constructor, TypeOfTypeNames } from "./TypeUtils.js";
 
 export class ValidationError extends TypeError {
   readonly name: string = "ValidationError";
@@ -38,22 +38,6 @@ export class UnionValidationError extends ValidationError {
     super(message);
   }
 }
-
-/**
- * This is a list of all the type strings produced by `typeof` that we allow in checkType.
- * All values are lowercase.
- *
- * function is not included because it is deceptive and doesn't tell you
- * very much about the type of the value.
- */
-type TypeOfTypeNames =
-  | "undefined"
-  | "object"
-  | "boolean"
-  | "number"
-  | "bigint"
-  | "string"
-  | "symbol";
 
 /**
  * This is a list of all the types that have custom validation in checkType.

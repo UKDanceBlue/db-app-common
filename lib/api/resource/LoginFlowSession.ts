@@ -1,11 +1,12 @@
-import type { DateTime } from "luxon";
+import { DateTime } from "luxon";
 
 import type { ValidationError } from "../../util/resourceValidation.js";
 import { checkType } from "../../util/resourceValidation.js";
 
+import type { PlainResourceObject, ResourceStatic } from "./Resource.js";
 import { Resource } from "./Resource.js";
-// Probably never used on the client
 
+// Probably never used on the client
 export class LoginFlowSessionResource extends Resource {
   sessionId!: string;
 
@@ -36,6 +37,41 @@ export class LoginFlowSessionResource extends Resource {
     checkType("string", this.redirectToAfterLogin, errors);
     return errors;
   }
+
+  public toPlain(): PlainLoginFlowSession {
+    const creationDate = this.creationDate.toISO();
+
+    if (creationDate === null) {
+      throw new Error(
+        "Got null for creationDate.toISO(), creationDate is probably invalid"
+      );
+    }
+    return {
+      sessionId: this.sessionId,
+      codeVerifier: this.codeVerifier,
+      creationDate,
+      redirectToAfterLogin: this.redirectToAfterLogin,
+    };
+  }
+
+  public static fromPlain(
+    plain: PlainLoginFlowSession
+  ): LoginFlowSessionResource {
+    return new LoginFlowSessionResource({
+      sessionId: plain.sessionId,
+      codeVerifier: plain.codeVerifier,
+      creationDate: DateTime.fromISO(plain.creationDate),
+      redirectToAfterLogin: plain.redirectToAfterLogin,
+    });
+  }
+}
+
+export interface PlainLoginFlowSession
+  extends PlainResourceObject<LoginFlowSessionResourceInitializer> {
+  sessionId: string;
+  codeVerifier: string;
+  creationDate: string;
+  redirectToAfterLogin: string | null;
 }
 
 export interface LoginFlowSessionResourceInitializer {
@@ -44,3 +80,8 @@ export interface LoginFlowSessionResourceInitializer {
   creationDate: LoginFlowSessionResource["creationDate"];
   redirectToAfterLogin?: LoginFlowSessionResource["redirectToAfterLogin"];
 }
+
+LoginFlowSessionResource satisfies ResourceStatic<
+  LoginFlowSessionResource,
+  PlainLoginFlowSession
+>;

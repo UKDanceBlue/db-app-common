@@ -3,6 +3,7 @@ import { DbRole } from "../../auth/index.js";
 import type { ValidationError } from "../../util/resourceValidation.js";
 import { checkType } from "../../util/resourceValidation.js";
 
+import type { PlainResourceObject, ResourceStatic } from "./Resource.js";
 import { Resource } from "./Resource.js";
 export class RoleResource extends Resource {
   dbRole!: DbRole;
@@ -27,6 +28,29 @@ export class RoleResource extends Resource {
     checkType("string", this.committee, errors, { allowNull: true });
     return errors;
   }
+
+  public toPlain(): PlainRole {
+    return {
+      dbRole: this.dbRole,
+      committeeRole: this.committeeRole,
+      committee: this.committee,
+    };
+  }
+
+  public static fromPlain(plain: PlainRole): RoleResource {
+    return new RoleResource({
+      dbRole: plain.dbRole,
+      committeeRole: plain.committeeRole,
+      committee: plain.committee,
+    });
+  }
+}
+
+export interface PlainRole
+  extends PlainResourceObject<RoleResourceInitializer> {
+  dbRole: DbRole;
+  committeeRole: CommitteeRole | null;
+  committee: string | null;
 }
 
 export interface RoleResourceInitializer {
@@ -34,3 +58,5 @@ export interface RoleResourceInitializer {
   committeeRole?: RoleResource["committeeRole"];
   committee?: RoleResource["committee"];
 }
+
+RoleResource satisfies ResourceStatic<RoleResource, PlainRole>;

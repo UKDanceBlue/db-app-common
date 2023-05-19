@@ -1,6 +1,8 @@
+import { arrayToBase64String, base64StringToArray } from "../../util/base64.js";
 import type { ValidationError } from "../../util/resourceValidation.js";
 import { checkType } from "../../util/resourceValidation.js";
 
+import type { PlainResourceObject, ResourceStatic } from "./Resource.js";
 import { Resource } from "./Resource.js";
 export class ImageResource extends Resource {
   imageId!: string;
@@ -58,6 +60,55 @@ export class ImageResource extends Resource {
     checkType("number", this.height, errors);
     return errors;
   }
+
+  toPlain(): PlainImage {
+    let imageData: string | null = null;
+
+    if (this.imageData) {
+      imageData = arrayToBase64String(this.imageData);
+    }
+    return {
+      imageId: this.imageId,
+      url: this.url?.toString() ?? null,
+      imageData,
+      mimeType: this.mimeType,
+      thumbHash: this.thumbHash,
+      alt: this.alt,
+      width: this.width,
+      height: this.height,
+    };
+  }
+
+  static fromPlain(plain: PlainImage): ImageResource {
+    let imageData: Uint8Array | null = null;
+
+    if (plain.imageData) {
+      imageData = base64StringToArray(plain.imageData);
+    }
+
+    return new ImageResource({
+      imageId: plain.imageId,
+      url: plain.url ? new URL(plain.url) : null,
+      imageData,
+      mimeType: plain.mimeType,
+      thumbHash: plain.thumbHash,
+      alt: plain.alt,
+      width: plain.width,
+      height: plain.height,
+    });
+  }
+}
+
+export interface PlainImage
+  extends PlainResourceObject<ImageResourceInitializer> {
+  imageId: string;
+  url: string | null;
+  imageData: string | null;
+  mimeType: string | null;
+  thumbHash: string | null;
+  alt: string | null;
+  width: number;
+  height: number;
 }
 
 export interface ImageResourceInitializer {
@@ -70,3 +121,5 @@ export interface ImageResourceInitializer {
   width: ImageResource["width"];
   height: ImageResource["height"];
 }
+
+ImageResource satisfies ResourceStatic<ImageResource, PlainImage>;

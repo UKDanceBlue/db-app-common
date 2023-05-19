@@ -1,3 +1,4 @@
+import type { PlainEvent } from "../api/resource/Event.js";
 import { EventResource } from "../api/resource/Event.js";
 import { isPaginatedApiResponse, isSingularOkApiResponse } from "../index.js";
 
@@ -32,7 +33,10 @@ export class EventClient {
     if (!isSingularOkApiResponse(apiResponse)) {
       throw new Error("Expected singular OK API response.");
     }
-    const resource = deserializeResourceApiResponse(apiResponse, EventResource);
+    const resource = deserializeResourceApiResponse<EventResource, PlainEvent>(
+      apiResponse,
+      EventResource
+    );
     return {
       apiResponse,
       resource,
@@ -55,7 +59,7 @@ export class EventClient {
     if (!isPaginatedApiResponse(apiResponse)) {
       throw new Error("Expected paginated API response.");
     }
-    const resource = deserializePaginatedApiResponse(
+    const resource = deserializePaginatedApiResponse<EventResource, PlainEvent>(
       apiResponse,
       EventResource
     );
