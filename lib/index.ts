@@ -5,8 +5,6 @@ export * from "./api/request/BodyTypes.js";
 export * from "./api/request/ListQueryTypes.js";
 export * from "./api/request/SearchTypes.js";
 export * from "./api/request/Event.js";
-export * from "./api/request/Image.js";
-export * from "./util/htmlDateTime.js";
 export * from "./auth/index.js";
 
 export * from "./util/comparators.js";
