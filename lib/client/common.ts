@@ -76,18 +76,19 @@ export async function getResponseBodyOrThrow(
       throw new HttpError(response.status, response.statusText);
     }
   } else {
+    let responseJson: unknown;
     try {
-      const responseJson = (await response.json()) as unknown;
-      if (isOkApiResponse(responseJson)) {
-        return responseJson;
-      } else {
-        throw new MalformedResponseError(
-          "Response body is not a valid OkApiResponse."
-        );
-      }
+      responseJson = await response.json();
     } catch (error) {
       throw new MalformedResponseError(
         "Failed to parse response body as JSON."
+      );
+    }
+    if (isOkApiResponse(responseJson)) {
+      return responseJson;
+    } else {
+      throw new MalformedResponseError(
+        "Response body is not a valid OkApiResponse."
       );
     }
   }

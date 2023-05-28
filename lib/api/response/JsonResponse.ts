@@ -36,9 +36,9 @@ export function isSingularOkApiResponse<
     response !== null &&
     "ok" in response &&
     response.ok === true &&
-    "data" in response &&
-    response.data !== undefined &&
-    isPrimitiveObject(response.data)
+    ("data" in response && response.data !== undefined
+      ? isPrimitiveObject(response.data)
+      : true)
   );
 }
 

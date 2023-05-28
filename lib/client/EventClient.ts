@@ -79,6 +79,9 @@ export class EventClient {
     const response = await this.apiClient.fetch(this.baseUrl, {
       method: "POST",
       body: JSON.stringify(event),
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
     const apiResponse = await getResponseBodyOrThrow(response);
     checkAndHandleError(apiResponse);
