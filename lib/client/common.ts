@@ -118,7 +118,7 @@ export function deserializeResourceApiResponse<
 
   const [deserialized, errors] = resourceClass.deserialize(
     // TODO get rid of this cast, there should be a low-overhead way to do this correctly (I want to avoid having to do a full type check)
-    apiResponse.data as P
+    apiResponse.data
   );
   if (errors.length > 0) {
     throw new DeserializationError("Failed to deserialize event.", errors[0]);

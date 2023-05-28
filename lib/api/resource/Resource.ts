@@ -68,18 +68,14 @@ export abstract class Resource {
    * @return A tuple containing the deserialized instance and any validation
    * errors.
    */
-  public static deserialize<
-    V extends PlainResourceObject<R>,
-    I,
-    R extends Resource
-  >(
+  public static deserialize<I, R extends Resource>(
     this: {
       new (initializer: I): R;
       fromPlain: ResourceStatic<R, PlainResourceObject<R>>["fromPlain"];
     },
-    plain: V
+    plain: PrimitiveObject
   ): [R, ValidationError[]] {
-    const instance = this.fromPlain(plain);
+    const instance = this.fromPlain(plain as PlainResourceObject<R>);
     const errors = instance.validateSelf();
     return [instance, errors];
   }
@@ -143,6 +139,6 @@ export interface ResourceStatic<
   new (...args: never[]): R;
   fromPlain: (plain: P) => R;
   serializeArray: (instances: R[]) => PrimitiveObject[];
-  deserialize: (plain: P) => [R, ValidationError[]];
+  deserialize: (plain: PrimitiveObject) => [R, ValidationError[]];
   deserializeArray: (plain: P[]) => [R[], ValidationError[]];
 }

@@ -32,12 +32,26 @@ type CreateBodyToEditBodyUtil<T> = {
     : OptionalToNullable<T[K]>;
 };
 
-export type CreateBodyToEditBody<T> =
-  | {
-      type: EditType.MODIFY;
-      value: Partial<CreateBodyToEditBodyUtil<T>>;
-    }
-  | {
-      type: EditType.REPLACE;
-      value: T;
-    };
+interface CreateBodyToEditBodyBase<T, E extends EditType> {
+  type: E;
+  value: Partial<CreateBodyToEditBodyUtil<T>> | T;
+}
+
+interface CreateBodyToEditBodyModify<T>
+  extends CreateBodyToEditBodyBase<T, EditType.MODIFY> {
+  value: Partial<CreateBodyToEditBodyUtil<T>>;
+}
+
+interface CreateBodyToEditBodyReplace<T>
+  extends CreateBodyToEditBodyBase<T, EditType.REPLACE> {
+  value: T;
+}
+
+export type CreateBodyToEditBody<
+  T,
+  E extends EditType
+> = E extends EditType.MODIFY
+  ? CreateBodyToEditBodyModify<T>
+  : E extends EditType.REPLACE
+  ? CreateBodyToEditBodyReplace<T>
+  : never;

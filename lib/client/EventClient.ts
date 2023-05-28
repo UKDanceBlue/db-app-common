@@ -1,10 +1,16 @@
 import type { PlainEvent } from "../api/resource/Event.js";
 import { EventResource } from "../api/resource/Event.js";
-import { isPaginatedApiResponse, isSingularOkApiResponse } from "../index.js";
+import type { CreateEventBody } from "../index.js";
+import {
+  isCreatedApiResponse,
+  isPaginatedApiResponse,
+  isSingularOkApiResponse,
+} from "../index.js";
 
 import type { ApiClient } from "./ApiClient.js";
 import {
   checkAndHandleError,
+  deserializeCreatedApiResponse,
   deserializePaginatedApiResponse,
   deserializeResourceApiResponse,
   getResponseBodyOrThrow,
@@ -60,6 +66,26 @@ export class EventClient {
       throw new Error("Expected paginated API response.");
     }
     const resource = deserializePaginatedApiResponse<EventResource, PlainEvent>(
+      apiResponse,
+      EventResource
+    );
+    return {
+      apiResponse,
+      resource,
+    };
+  }
+
+  public async createEvent(event: CreateEventBody) {
+    const response = await this.apiClient.fetch(this.baseUrl, {
+      method: "POST",
+      body: JSON.stringify(event),
+    });
+    const apiResponse = await getResponseBodyOrThrow(response);
+    checkAndHandleError(apiResponse);
+    if (!isCreatedApiResponse(apiResponse)) {
+      throw new Error("Expected created API response.");
+    }
+    const resource = deserializeCreatedApiResponse<EventResource, PlainEvent>(
       apiResponse,
       EventResource
     );
