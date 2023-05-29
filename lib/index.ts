@@ -30,6 +30,7 @@ export * from "./util/comparators.js";
 export * from "./util/formData.js";
 export * from "./util/intervalTools.js";
 export * from "./util/TypeUtils.js";
+export * from "./util/typeTransformers.js";
 export * from "./util/resourceValidation.js";
 
 export { ApiClient } from "./client/ApiClient.js";

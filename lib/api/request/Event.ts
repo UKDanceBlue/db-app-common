@@ -1,3 +1,4 @@
+import type { NullishToOptional } from "../../index.js";
 import type { EventResource, PlainEvent } from "../resource/Event.js";
 
 import type { CreateBodyToEditBody, EditType } from "./BodyTypes.js";
@@ -7,7 +8,7 @@ import type {
   SortingOptions,
 } from "./ListQueryTypes.js";
 
-export type CreateEventBody = Omit<PlainEvent, "eventId">;
+export type CreateEventBody = NullishToOptional<Omit<PlainEvent, "eventId">>;
 
 export type EditEventBody<E extends EditType = EditType> = CreateBodyToEditBody<
   PlainEvent,

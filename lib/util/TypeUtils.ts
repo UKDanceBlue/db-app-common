@@ -130,6 +130,21 @@ export type OmitNever<T> = {
   [K in keyof T as T[K] extends never ? never : K]: T[K];
 };
 
+type NullishToOptionalPart1<T extends object> = Partial<
+  OmitNever<{
+    [K in keyof T]: T[K] extends NonNullable<T[K]>
+      ? never
+      : Exclude<T[K], null | undefined>;
+  }>
+>;
+
+type NullishToOptionalPart2<T extends object> = OmitNever<{
+  [K in keyof T]: T[K] extends NonNullable<T[K]> ? T[K] : never;
+}>;
+
+export type NullishToOptional<T extends object> = NullishToOptionalPart1<T> &
+  NullishToOptionalPart2<T>;
+
 export type ExcludeValues<T extends object, V> = OmitNever<{
   [K in keyof T]: Exclude<T[K], V>;
 }>;
