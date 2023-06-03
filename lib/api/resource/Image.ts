@@ -13,7 +13,7 @@ export class ImageResource extends Resource {
 
   mimeType!: string | null;
 
-  thumbHash!: string | null;
+  thumbHash!: Uint8Array | null;
 
   alt!: string | null;
 
@@ -67,12 +67,19 @@ export class ImageResource extends Resource {
     if (this.imageData) {
       imageData = arrayToBase64String(this.imageData);
     }
+
+    let thumbHash: string | null = null;
+
+    if (this.thumbHash) {
+      thumbHash = arrayToBase64String(this.thumbHash);
+    }
+
     return {
       imageId: this.imageId,
       url: this.url?.toString() ?? null,
       imageData,
       mimeType: this.mimeType,
-      thumbHash: this.thumbHash,
+      thumbHash,
       alt: this.alt,
       width: this.width,
       height: this.height,
@@ -86,12 +93,18 @@ export class ImageResource extends Resource {
       imageData = base64StringToArray(plain.imageData);
     }
 
+    let thumbHash: Uint8Array | null = null;
+
+    if (plain.thumbHash) {
+      thumbHash = base64StringToArray(plain.thumbHash);
+    }
+
     return new ImageResource({
       imageId: plain.imageId,
       url: plain.url ? new URL(plain.url) : null,
       imageData,
       mimeType: plain.mimeType,
-      thumbHash: plain.thumbHash,
+      thumbHash,
       alt: plain.alt,
       width: plain.width,
       height: plain.height,
