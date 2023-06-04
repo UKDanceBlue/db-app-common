@@ -124,6 +124,42 @@ export interface LocalCacheProvider {
   getCacheUsage(): Promise<CacheUsage>;
 }
 
+export class BasicProvider implements LocalCacheProvider {
+  private cache = new Map<string, LocalCacheEntry>();
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async get(key: string): Promise<LocalCacheEntry | undefined> {
+    return this.cache.get(key);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async set(key: string, value: LocalCacheEntry): Promise<void> {
+    this.cache.set(key, value);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async delete(key: string): Promise<void> {
+    this.cache.delete(key);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async reset(): Promise<void> {
+    this.cache.clear();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async getCacheUsage(): Promise<CacheUsage> {
+    let size = 0;
+    for (const entry of this.cache.values()) {
+      size += entry.value.length;
+    }
+    return {
+      count: this.cache.size,
+      size,
+    };
+  }
+}
+
 export interface LocalCacheConfig {
   /**
    * The cache provider to use.

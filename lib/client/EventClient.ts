@@ -7,19 +7,16 @@ import {
   isSingularOkApiResponse,
 } from "../index.js";
 
-import type { ApiClient } from "./ApiClient.js";
+import { type ApiClient, SubClientBase } from "./ApiClient.js";
 import {
-  checkAndHandleError,
   deserializeCreatedApiResponse,
   deserializePaginatedApiResponse,
   deserializeResourceApiResponse,
-  getResponseBodyOrThrow,
 } from "./common.js";
 
-export class EventClient {
-  private baseUrl: URL;
-  constructor(private apiClient: ApiClient) {
-    this.baseUrl = new URL(`${apiClient.apiBaseUrl.href}/event/`);
+export class EventClient extends SubClientBase {
+  constructor(apiClient: ApiClient) {
+    super(apiClient, "events");
   }
 
   /**
@@ -32,13 +29,10 @@ export class EventClient {
    * @throws ValidationError if the response is OK and the body is a valid ApiResponse but the data is not a valid EventResource.
    */
   public async getEvent(eventId: string) {
-    const url = new URL(eventId, this.baseUrl);
-    const response = await this.apiClient.fetch(url);
-    const apiResponse = await getResponseBodyOrThrow(response);
-    checkAndHandleError(apiResponse);
-    if (!isSingularOkApiResponse(apiResponse)) {
-      throw new Error("Expected singular OK API response.");
-    }
+    const apiResponse = await this.makeRequest({
+      path: eventId,
+      typeGuard: isSingularOkApiResponse,
+    });
     const resource = deserializeResourceApiResponse<EventResource, PlainEvent>(
       apiResponse,
       EventResource
@@ -59,12 +53,9 @@ export class EventClient {
    * @throws DeserializationError if the response is OK and the body is a valid ApiResponse and the data is a valid EventResource[] but the data cannot be deserialized.
    */
   public async getAllEvents() {
-    const response = await this.apiClient.fetch(this.baseUrl);
-    const apiResponse = await getResponseBodyOrThrow(response);
-    checkAndHandleError(apiResponse);
-    if (!isPaginatedApiResponse(apiResponse)) {
-      throw new Error("Expected paginated API response.");
-    }
+    const apiResponse = await this.makeRequest({
+      typeGuard: isPaginatedApiResponse,
+    });
     const resource = deserializePaginatedApiResponse<EventResource, PlainEvent>(
       apiResponse,
       EventResource
@@ -76,18 +67,11 @@ export class EventClient {
   }
 
   public async createEvent(event: CreateEventBody) {
-    const response = await this.apiClient.fetch(this.baseUrl, {
+    const apiResponse = await this.makeRequest({
       method: "POST",
       body: JSON.stringify(event),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      typeGuard: isCreatedApiResponse,
     });
-    const apiResponse = await getResponseBodyOrThrow(response);
-    checkAndHandleError(apiResponse);
-    if (!isCreatedApiResponse(apiResponse)) {
-      throw new Error("Expected created API response.");
-    }
     const resource = deserializeCreatedApiResponse<EventResource, PlainEvent>(
       apiResponse,
       EventResource
