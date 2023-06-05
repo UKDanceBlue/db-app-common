@@ -3,6 +3,7 @@ import { isPrimitiveObject } from "../index.js";
 
 import { getKeyForResource } from "./config.js";
 import type {
+  CacheEntryConfig,
   CacheUsage,
   LocalCacheConfig,
   ParsedLocalCacheEntry,
@@ -12,22 +13,17 @@ import type {
  * Create a cache entry for the given resource.
  *
  * @param resource The resource to create a cache entry for.
- * @param expiresAt The time at which the cache entry will expire.
+ * @param config The cache entry config.
  * @return The cache entry.
  */
 export function makeCacheEntryForResource(
   resource: Resource,
-  expiresAt?: number
+  config: CacheEntryConfig
 ): [string, ParsedLocalCacheEntry] {
-  return expiresAt == null || expiresAt < 0
-    ? [
-        getKeyForResource(resource.constructor, resource.getUniqueId()),
-        { value: resource.toPlain() },
-      ]
-    : [
-        getKeyForResource(resource.constructor, resource.getUniqueId()),
-        { value: resource.toPlain(), expiresAt },
-      ];
+  return [
+    getKeyForResource(resource.constructor, resource.getUniqueId()),
+    { value: resource.toPlain(), ...config },
+  ];
 }
 
 export class LocalCache {
@@ -77,15 +73,18 @@ export class LocalCache {
     return this.config.provider.getCacheUsage();
   }
 
-  public async setResource(resource: Resource): Promise<void> {
-    const [key, entry] = makeCacheEntryForResource(resource);
+  public async setResource(
+    resource: Resource,
+    config: CacheEntryConfig
+  ): Promise<void> {
+    const [key, entry] = makeCacheEntryForResource(resource, config);
     return this.set(key, entry);
   }
 
   public async getResource<R extends Resource>(
     resourceClass: ResourceStatic<R>,
     id: string
-  ): Promise<R | undefined> {
+  ): Promise<[R, CacheEntryConfig] | undefined> {
     const key = getKeyForResource(resourceClass, id);
     const entry = await this.get(key);
     if (entry == null) return undefined;
@@ -94,6 +93,10 @@ export class LocalCache {
       // eslint-disable-next-line @typescript-eslint/no-throw-literal
       throw errors[0];
     }
-    return resource;
+    return [resource, entry];
+  }
+
+  public async isOnline(): Promise<boolean> {
+    return this.config.provider.getConnectionStatus();
   }
 }

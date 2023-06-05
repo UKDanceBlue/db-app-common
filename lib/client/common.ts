@@ -61,19 +61,28 @@ export class ErrorApiResponseError extends ApiClientError {
   }
 }
 
-export async function getResponseBodyOrThrow(
-  response: Response
-): Promise<ApiResponse> {
+export async function getResponseBodyOrThrow(response: {
+  ok: boolean;
+  status?: number;
+  statusText?: string;
+  json: () => Promise<unknown>;
+}): Promise<ApiResponse> {
   if (!response.ok) {
     try {
-      const body = (await response.json()) as unknown;
+      const body = await response.json();
       if (isErrorApiResponse(body)) {
         return body;
       } else {
-        throw new HttpError(response.status, response.statusText);
+        throw new HttpError(
+          response.status ?? -1,
+          response.statusText ?? "Bad fetch status with no status"
+        );
       }
     } catch (error) {
-      throw new HttpError(response.status, response.statusText);
+      throw new HttpError(
+        response.status ?? -1,
+        response.statusText ?? "Failed Fetch with no status"
+      );
     }
   } else {
     let responseJson: unknown;

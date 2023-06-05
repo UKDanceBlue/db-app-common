@@ -4,6 +4,9 @@ dependencies:
   '@types/validator':
     specifier: ^13.7.17
     version: 13.7.17
+  utility-types:
+    specifier: ^3.10.0
+    version: 3.10.0
   validator:
     specifier: ^13.9.0
     version: 13.9.0
@@ -3877,6 +3880,11 @@ packages:
     dependencies:
       punycode: 2.3.0
     dev: true
+
+  /utility-types@3.10.0:
+    resolution: {integrity: sha512-O11mqxmi7wMKCo6HKFt5AhO4BwY3VV68YU07tgxfz8zJTIxr4BpsezN49Ffwy9j3ZpwwJp4fkRwjRzq3uWE6Rg==}
+    engines: {node: '>= 4'}
+    dev: false
 
   /v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}

@@ -3,6 +3,8 @@ import type { PrimitiveObject, Resource } from "../index.js";
 /**
  * The configuration for a cache entry.
  *
+ * All time units are UTC timestamps in milliseconds, i.e. `Date.now()`.
+ *
  * A cache entry can be one of four states:
  * - Fresh: The entry is probably the same as the server
  * - Stale: The entry is old, but it may still be fresh
@@ -109,12 +111,11 @@ export interface LocalCacheProvider {
    */
   delete(key: string): Promise<void>;
   /**
-   * Delete all cache entries.
+   * Reset the cache, should at minimum delete all cache entries.
    *
    * @return A promise that resolves when all cache entries have been deleted.
    */
   reset(): Promise<void>;
-
   /**
    * Get the cache usage.
    *
@@ -122,10 +123,19 @@ export interface LocalCacheProvider {
    * @see CacheUsage
    */
   getCacheUsage(): Promise<CacheUsage>;
+  /**
+   * Get the connection status. True if the device is online, false if the device is offline.
+   *
+   * @return A promise that resolves to the connection status.
+   */
+  getConnectionStatus(): Promise<boolean>;
 }
 
 export class BasicProvider implements LocalCacheProvider {
-  private cache = new Map<string, LocalCacheEntry>();
+  private cache: Map<string, LocalCacheEntry> = new Map<
+    string,
+    LocalCacheEntry
+  >();
 
   // eslint-disable-next-line @typescript-eslint/require-await
   async get(key: string): Promise<LocalCacheEntry | undefined> {
@@ -157,6 +167,13 @@ export class BasicProvider implements LocalCacheProvider {
       count: this.cache.size,
       size,
     };
+  }
+
+  /**
+   * This is a stub implementation that always returns true.
+   */ // eslint-disable-next-line @typescript-eslint/require-await, class-methods-use-this
+  async getConnectionStatus(): Promise<boolean> {
+    return true;
   }
 }
 
@@ -205,9 +222,9 @@ export interface LocalCacheConfig {
 /**
  * The local cache mode.
  *
- * This usually defaults to 'fallback
+ * This usually defaults to 'fallback'
  *
- * - never: never use the local cache, always fetch from the server
+ * - never: never use the local cache, always fetch from the server; will also prevent caching of responses
  * - fallback-fresh: use fresh cache entries if the request fails or the device is offline
  * - fallback: use fresh or stale cache entries if the request fails or the device is offline
  * - fallback-always: use any non-expired cache entry if the request fails or the device is offline
@@ -219,13 +236,13 @@ export interface LocalCacheConfig {
  * are all odd, and non-fallbacks are all even.
  */
 export enum LocalCacheMode {
-  "never",
-  "fallback-fresh",
-  "fresh",
-  "fallback",
-  "stale",
-  "fallback-always",
-  "always",
+  "never" = -1,
+  "fallback-fresh" = 1,
+  "fresh" = 2,
+  "fallback" = 3, // effectively means fallback-stale
+  "stale" = 4,
+  "fallback-always" = 5,
+  "always" = 6,
 }
 
 export function isFallbackMode(mode: LocalCacheMode): boolean {
@@ -266,6 +283,8 @@ export interface ApiClientConfig {
    * If not provided, then the token is assumed to be set by the device.
    * This is the case for example if an HTTP-only cookie is used to store the
    * token.
+   *
+   * Will be added like `Authorization: Bearer <token>`.
    */
   getToken?: () => Promise<string>;
   /**
