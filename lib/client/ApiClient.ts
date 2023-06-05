@@ -1,26 +1,16 @@
-import { isOkApiResponse, isPrimitiveObject } from "../index.js";
-import type {
-  BaseResponse,
-  OkApiResponse,
-  PlainResourceObject,
-  Resource,
-  ResourceStatic,
-} from "../index.js";
+import { isPrimitiveObject } from "../index.js";
+import type { BaseResponse } from "../index.js";
 
 import { EventClient } from "./EventClient.js";
 import { LocalCache } from "./LocalCache.js";
-import {
-  checkAndHandleError,
-  deserializeResourceApiResponse,
-  getResponseBodyOrThrow,
-} from "./common.js";
+import { checkAndHandleError, getResponseBodyOrThrow } from "./common.js";
 import type {
   ApiCallOptions,
   ApiClientConfig,
   CacheEntryConfig,
   ParsedLocalCacheEntry,
 } from "./config.js";
-import { LocalCacheMode, getKeyForResource, isFallbackMode } from "./config.js";
+import { LocalCacheMode, isFallbackMode } from "./config.js";
 
 const secretSymbol = Symbol("secret");
 
@@ -164,7 +154,7 @@ export class SubClientBase {
    * @param options.path The path to append to `options.url`.
    * @return The response from the API.
    */
-  private async makeRequest<ApiResType extends BaseResponse>({
+  protected async makeRequestUncached<ApiResType extends BaseResponse>({
     body,
     url = this.baseUrl,
     path,
@@ -207,105 +197,6 @@ export class SubClientBase {
   }
 
   /**
-   * Make a request to the API and return a resource.
-   * If the resource is in the local cache, it will be returned from there.
-   * Otherwise, it will be fetched from the API and added to the local cache.
-   *
-   * The type of the response should be a simple OkApiResponse.
-   *
-   * @param options The options for the request.
-   * @param resourceClass The class of the resource to return.
-   * @param uuid The UUID of the resource to return.
-   * @param cacheEntryConfig Configuration for any created cache entries.
-   * @return The resource.
-   */
-  protected async requestResource<
-    ApiResType extends BaseResponse,
-    R extends Resource
-  >(
-    options: Omit<MakeRequestOptions<ApiResType>, "typeGuard">,
-    resourceClass: ResourceStatic<R>,
-    uuid: string,
-    cacheEntryConfig?: CacheEntryConfig
-  ): Promise<{
-    apiResponse: OkApiResponse<PlainResourceObject<R>>;
-    resource: R | undefined;
-  }> {
-    const localCache = this.apiClient.getLocalCache(secretSymbol);
-
-    let localCacheMode: LocalCacheMode =
-      options.localCache ??
-      this.apiClient.config.defaultOptions?.localCache ??
-      LocalCacheMode.fallback;
-    if (localCache && localCacheMode > LocalCacheMode.never) {
-      // If fallback is requested, check if we're offline.
-      const isOffline = !(await localCache.isOnline());
-
-      // If we're offline, and fallback is requested, increment the local cache mode (i.e. fallback-stale -> stale)
-      if (isFallbackMode(localCacheMode) && isOffline) {
-        localCacheMode++;
-      }
-
-      // Lookup in local cache.
-      const cacheResult = await localCache.getResource(resourceClass, uuid);
-
-      // Cache hit, check if we should use it.
-      if (cacheResult) {
-        const now = Date.now();
-        const [resource, config] = cacheResult;
-
-        const expiresAt = config.expiresAt ?? Number.POSITIVE_INFINITY;
-        const freshUntil = config.freshUntil ?? Number.NEGATIVE_INFINITY;
-        const staleUntil = config.staleUntil ?? Number.POSITIVE_INFINITY;
-
-        if (expiresAt < now) {
-          await localCache.delete(getKeyForResource(resourceClass, uuid));
-        } else if (
-          (localCacheMode >= LocalCacheMode.fresh && freshUntil > now) ||
-          (localCacheMode >= LocalCacheMode.stale && staleUntil > now) ||
-          localCacheMode >= LocalCacheMode.always
-        ) {
-          return {
-            apiResponse: {
-              data: resource.toPlain(),
-              ok: true,
-              clientActions: [],
-            },
-            resource,
-          };
-        }
-      }
-    }
-
-    const apiResponse = await this.makeRequest<
-      OkApiResponse<PlainResourceObject<R>>
-    >({
-      ...options,
-      // Force the use of isOkApiResponse as the type guard.
-      typeGuard: isOkApiResponse,
-    });
-
-    const { clientActions, resource } = deserializeResourceApiResponse<
-      R,
-      PlainResourceObject<R>
-    >(apiResponse, resourceClass);
-
-    if (resource && localCache && localCacheMode > LocalCacheMode.never) {
-      await localCache.setResource(resource, {
-        // Cache for 6 hours by default.
-        expiresAt: Date.now() + 1000 * 60 * 60 * 6,
-        ...cacheEntryConfig,
-      });
-    }
-
-    if (clientActions.length > 0) {
-      // TODO: Do client actions here.
-    }
-
-    return { apiResponse, resource };
-  }
-
-  /**
    * Make a request to the API and return an opaque ApiResponse.
    *
    * If the response is in the local cache, it will be returned from there.
@@ -318,7 +209,7 @@ export class SubClientBase {
    * @param cacheEntryConfig Configuration for any created cache entries.
    * @return The response.
    */
-  protected async request<ApiResType extends BaseResponse>(
+  protected async makeRequest<ApiResType extends BaseResponse>(
     options: MakeRequestOptions<ApiResType>,
     cacheEntryConfig?: CacheEntryConfig
   ): Promise<ApiResType | undefined> {
@@ -373,7 +264,7 @@ export class SubClientBase {
       }
     }
 
-    const apiResponse = await this.makeRequest(options);
+    const apiResponse = await this.makeRequestUncached(options);
 
     if (localCache && localCacheMode > LocalCacheMode.never) {
       const expiresAt = Date.now() + 1000 * 60 * 60 * 6;

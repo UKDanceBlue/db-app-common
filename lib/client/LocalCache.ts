@@ -1,30 +1,11 @@
-import type { PrimitiveObject, Resource, ResourceStatic } from "../index.js";
+import type { PrimitiveObject } from "../index.js";
 import { isPrimitiveObject } from "../index.js";
 
-import { getKeyForResource } from "./config.js";
 import type {
-  CacheEntryConfig,
   CacheUsage,
   LocalCacheConfig,
   ParsedLocalCacheEntry,
 } from "./config.js";
-
-/**
- * Create a cache entry for the given resource.
- *
- * @param resource The resource to create a cache entry for.
- * @param config The cache entry config.
- * @return The cache entry.
- */
-export function makeCacheEntryForResource(
-  resource: Resource,
-  config: CacheEntryConfig
-): [string, ParsedLocalCacheEntry] {
-  return [
-    getKeyForResource(resource.constructor, resource.getUniqueId()),
-    { value: resource.toPlain(), ...config },
-  ];
-}
 
 export class LocalCache {
   constructor(private readonly config: LocalCacheConfig) {}
@@ -71,29 +52,6 @@ export class LocalCache {
 
   public async getUsage(): Promise<CacheUsage> {
     return this.config.provider.getCacheUsage();
-  }
-
-  public async setResource(
-    resource: Resource,
-    config: CacheEntryConfig
-  ): Promise<void> {
-    const [key, entry] = makeCacheEntryForResource(resource, config);
-    return this.set(key, entry);
-  }
-
-  public async getResource<R extends Resource>(
-    resourceClass: ResourceStatic<R>,
-    id: string
-  ): Promise<[R, CacheEntryConfig] | undefined> {
-    const key = getKeyForResource(resourceClass, id);
-    const entry = await this.get(key);
-    if (entry == null) return undefined;
-    const [resource, errors] = resourceClass.deserialize(entry.value);
-    if (errors.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-throw-literal
-      throw errors[0];
-    }
-    return [resource, entry];
   }
 
   public async isOnline(): Promise<boolean> {

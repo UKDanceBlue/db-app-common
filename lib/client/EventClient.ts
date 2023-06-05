@@ -29,7 +29,23 @@ export class EventClient extends SubClientBase {
    * @throws ValidationError if the response is OK and the body is a valid ApiResponse but the data is not a valid EventResource.
    */
   public async getEvent(eventId: string) {
-    return this.requestResource({ path: eventId }, EventResource, eventId);
+    const apiResponse = await this.makeRequest({
+      path: eventId,
+      typeGuard: isSingularOkApiResponse,
+    });
+
+    if (!apiResponse) {
+      throw new Error("Unexpected empty response");
+    }
+
+    const resource = deserializeResourceApiResponse<EventResource, PlainEvent>(
+      apiResponse,
+      EventResource
+    );
+    return {
+      apiResponse,
+      resource,
+    };
   }
 
   /**
@@ -42,7 +58,7 @@ export class EventClient extends SubClientBase {
    * @throws DeserializationError if the response is OK and the body is a valid ApiResponse and the data is a valid EventResource[] but the data cannot be deserialized.
    */
   public async getAllEvents() {
-    const apiResponse = await this.request({
+    const apiResponse = await this.makeRequest({
       typeGuard: isPaginatedApiResponse,
     });
     if (!apiResponse) {
@@ -59,7 +75,7 @@ export class EventClient extends SubClientBase {
   }
 
   public async createEvent(event: CreateEventBody) {
-    const apiResponse = await this.request({
+    const apiResponse = await this.makeRequest({
       method: "POST",
       body: JSON.stringify(event),
       typeGuard: isCreatedApiResponse,
