@@ -9,6 +9,7 @@ export * from "./api/response/JsonResponse.js";
 
 export * from "./api/resource/Resource.js";
 export * from "./api/resource/Configuration.js";
+export * from "./api/resource/Device.js";
 export * from "./api/resource/Event.js";
 export * from "./api/resource/Image.js";
 export * from "./api/resource/LoginFlowSession.js";
