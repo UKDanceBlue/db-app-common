@@ -14,11 +14,16 @@ import { LocalCacheMode, isFallbackMode } from "./config.js";
 
 const secretSymbol = Symbol("secret");
 
-interface ApiClientConfigWithFetch extends Omit<ApiClientConfig, "fetch"> {
+interface ApiClientConfigWithFetch
+  extends Omit<ApiClientConfig, "fetch" | "Headers"> {
   /**
    * The fetch function to use for requests.
    */
   fetch: Required<ApiClientConfig>["fetch"];
+  /**
+   * The Headers constructor to use for requests.
+   */
+  Headers: Required<ApiClientConfig>["Headers"];
 }
 
 function appendToUrl(url: URL, path: string): URL {
@@ -57,6 +62,7 @@ export class ApiClient {
     this.#config = {
       ...config,
       fetch: config.fetch ?? globalThis.fetch.bind(globalThis),
+      Headers: config.Headers ?? globalThis.Headers,
     };
     if (this.#config.cache) {
       this.#localCache = new LocalCache(this.#config.cache);
@@ -169,7 +175,7 @@ export class SubClientBase {
     const { fetchCache: defaultFetchCache } =
       this.apiClient.config.defaultOptions ?? {};
 
-    const headers = new Headers();
+    const headers = new this.apiClient.config.Headers();
     headers.set("Accept", "application/json");
     headers.set("Content-Type", "application/json");
 

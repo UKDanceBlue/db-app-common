@@ -302,7 +302,12 @@ export interface ApiClientConfig {
   defaultOptions?: ApiCallOptions;
   /**
    * The fetch function to use.
-   * If not provided, then the global fetch function is used.
+   * If not provided, then `globalThis.fetch` is used.
    */
   fetch?: typeof globalThis.fetch;
+  /**
+   * The Headers constructor to use.
+   * If not provided, then `globalThis.Headers` is used.
+   */
+  Headers?: typeof globalThis.Headers;
 }
