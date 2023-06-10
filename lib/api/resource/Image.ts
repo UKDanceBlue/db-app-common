@@ -11,7 +11,7 @@ export class ImageResource extends Resource {
 
   imageData!: Uint8Array | null;
 
-  mimeType!: string | null;
+  mimeType!: string;
 
   thumbHash!: Uint8Array | null;
 
@@ -35,7 +35,7 @@ export class ImageResource extends Resource {
     this.imageId = imageId;
     this.url = url ?? null;
     this.imageData = imageData ?? null;
-    this.mimeType = mimeType ?? null;
+    this.mimeType = mimeType;
     this.thumbHash = thumbHash ?? null;
     this.alt = alt ?? null;
     this.width = width;
@@ -117,7 +117,7 @@ export interface PlainImage
   imageId: string;
   url: string | null;
   imageData: string | null;
-  mimeType: string | null;
+  mimeType: string;
   thumbHash: string | null;
   alt: string | null;
   width: number;
@@ -128,7 +128,7 @@ export interface ImageResourceInitializer {
   imageId: ImageResource["imageId"];
   url?: ImageResource["url"];
   imageData?: ImageResource["imageData"];
-  mimeType?: ImageResource["mimeType"];
+  mimeType: ImageResource["mimeType"];
   thumbHash?: ImageResource["thumbHash"];
   alt?: ImageResource["alt"];
   width: ImageResource["width"];

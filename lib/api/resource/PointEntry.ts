@@ -12,7 +12,7 @@ export class PointEntryResource extends Resource {
 
   type!: TeamType;
 
-  comment!: string;
+  comment!: string | null;
 
   points!: number;
 
@@ -89,7 +89,7 @@ export interface PlainPointEntry
   extends PlainResourceObject<PointEntryResourceInitializer> {
   entryId: string;
   type: TeamType;
-  comment: string;
+  comment: string | null;
   points: number;
   personFrom: PlainPerson | string | null;
   team: PlainTeam | string;

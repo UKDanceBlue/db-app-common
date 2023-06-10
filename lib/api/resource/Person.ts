@@ -15,7 +15,7 @@ import type { PlainTeam } from "./Team.js";
 import { TeamResource } from "./Team.js";
 
 export class PersonResource extends Resource {
-  userId!: string;
+  personId!: string;
 
   authIds!: Partial<Record<AuthSource, string>>;
 
@@ -36,7 +36,7 @@ export class PersonResource extends Resource {
   pointEntries!: PointEntryResource[] | string[];
 
   constructor({
-    userId,
+    personId: userId,
     authIds,
     firstName,
     lastName,
@@ -48,7 +48,7 @@ export class PersonResource extends Resource {
     pointEntries,
   }: PersonResourceInitializer) {
     super();
-    this.userId = userId;
+    this.personId = userId;
     this.authIds = authIds;
     this.firstName = firstName ?? null;
     this.lastName = lastName ?? null;
@@ -62,7 +62,7 @@ export class PersonResource extends Resource {
 
   toUserData(): UserData {
     const userData: UserData = {
-      userId: this.userId,
+      userId: this.personId,
       auth: roleToAuthorization(this.role),
     };
     userData.teamIds = this.memberOf.map((team) =>
@@ -76,7 +76,7 @@ export class PersonResource extends Resource {
 
   validateSelf(): ValidationError[] {
     const errors: ValidationError[] = [];
-    checkType("string", this.userId, errors);
+    checkType("string", this.personId, errors);
     checkType("object", this.authIds, errors);
     for (const [key, value] of Object.entries(this.authIds)) {
       checkType("Enum", key, errors, {
@@ -165,7 +165,7 @@ export class PersonResource extends Resource {
       ? this.pointEntries
       : this.pointEntries.map((i) => i.toPlain());
     return {
-      userId: this.userId,
+      personId: this.personId,
       authIds: this.authIds,
       firstName: this.firstName,
       lastName: this.lastName,
@@ -189,7 +189,7 @@ export class PersonResource extends Resource {
       ? plain.pointEntries
       : plain.pointEntries.map((i) => PointEntryResource.fromPlain(i));
     return new PersonResource({
-      userId: plain.userId,
+      personId: plain.personId,
       authIds: plain.authIds,
       firstName: plain.firstName,
       lastName: plain.lastName,
@@ -205,7 +205,7 @@ export class PersonResource extends Resource {
 
 export interface PlainPerson
   extends PlainResourceObject<PersonResourceInitializer> {
-  userId: string;
+  personId: string;
   authIds: Partial<Record<AuthSource, string>>;
   firstName: string | null;
   lastName: string | null;
@@ -218,7 +218,7 @@ export interface PlainPerson
 }
 
 export interface PersonResourceInitializer {
-  userId: PersonResource["userId"];
+  personId: PersonResource["personId"];
   authIds: PersonResource["authIds"];
   firstName?: PersonResource["firstName"];
   lastName?: PersonResource["lastName"];
