@@ -36,6 +36,8 @@ export * from "./util/resourceValidation.js";
 
 export { ApiClient } from "./client/ApiClient.js";
 
+export * from "./style/color.js";
+
 // React specific code:
 export * from "./util/formReducer.js";
 export { initializeReact } from "./util/reactLib.js";
