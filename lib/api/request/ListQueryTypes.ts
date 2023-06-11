@@ -89,3 +89,34 @@ export interface FilterOptions<Resource extends object> {
     >
   >;
 }
+
+export type ListQueryType<Resource extends object> = FilterOptions<Resource> &
+  PaginationOptions &
+  SortingOptions;
+
+export function makeListQuery<Resource extends object>(
+  options: Partial<ListQueryType<Resource>> = {}
+) {
+  const { page, pageSize, sortBy, sortDirection, filter } = options;
+
+  const query = new URLSearchParams();
+
+  if (page) {
+    query.set("page", page.toString());
+  }
+  if (pageSize) {
+    query.set("pageSize", pageSize.toString());
+  }
+  if (sortBy) {
+    query.set("sortBy", sortBy);
+  }
+  if (sortDirection) {
+    query.set("sortDirection", sortDirection);
+  }
+
+  if (filter) {
+    // TODO: Implement filters
+  }
+
+  return query;
+}
