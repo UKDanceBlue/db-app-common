@@ -1,55 +1,9 @@
-import type { ValidationError } from "../../util/resourceValidation.js";
-import { checkType } from "../../util/resourceValidation.js";
+import { Field, ID, ObjectType } from "type-graphql";
 
-import type { PlainResourceObject, ResourceStatic } from "./Resource.js";
 import { Resource } from "./Resource.js";
+
+@ObjectType()
 export class NotificationResource extends Resource {
+  @Field(() => ID)
   notificationId!: string;
-
-  constructor({ notificationId }: NotificationResourceInitializer) {
-    super();
-    this.notificationId = notificationId;
-  }
-
-  validateSelf(): ValidationError[] {
-    const errors: ValidationError[] = [];
-    checkType("string", this.notificationId, errors);
-    return errors;
-  }
-
-  public toPlain(): PlainNotification {
-    return {
-      notificationId: this.notificationId,
-    };
-  }
-
-  public static fromPlain(plain: PlainNotification): NotificationResource {
-    return new NotificationResource({
-      notificationId: plain.notificationId,
-    });
-  }
-
-  static graphqlType = `#graphql
-    type Notification {
-      notificationId: ID!
-    }
-  `;
-
-  static graphqlQueries = `#graphql
-    notification(notificationId: ID!): Notification
-  `;
 }
-
-export interface PlainNotification
-  extends PlainResourceObject<NotificationResourceInitializer> {
-  notificationId: string;
-}
-
-export interface NotificationResourceInitializer {
-  notificationId: NotificationResource["notificationId"];
-}
-
-NotificationResource satisfies ResourceStatic<
-  NotificationResource,
-  PlainNotification
->;

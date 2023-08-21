@@ -1,3 +1,5 @@
+import { registerEnumType } from "type-graphql";
+
 export enum AuthSource {
   UkyLinkblue = "uky_linkblue",
   Anonymous = "anonymous",
@@ -53,3 +55,24 @@ export interface JwtPayload {
   team_ids?: string[];
   captain_of_team_ids?: string[];
 }
+
+// Registering the enum types with TypeGraphQL
+registerEnumType(AuthSource, {
+  name: "AuthSource",
+  description: "The source of authentication",
+});
+
+registerEnumType(AccessLevel, {
+  name: "AccessLevel",
+  description: "The level of access a user has",
+});
+
+registerEnumType(DbRole, {
+  name: "DbRole",
+  description: "DanceBlue roles",
+});
+
+registerEnumType(CommitteeRole, {
+  name: "CommitteeRole",
+  description: "Roles within a committee",
+});
