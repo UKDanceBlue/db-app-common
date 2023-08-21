@@ -29,6 +29,16 @@ export class ConfigurationResource extends Resource {
       key: plain.key,
     });
   }
+
+  static graphqlType = `#graphql
+    type Configuration {
+      key: String!
+    }
+  `;
+
+  static graphqlQueries = `#graphql
+    configuration(key: String!): Configuration
+  `;
 }
 
 export interface ConfigurationResourceInitializer {

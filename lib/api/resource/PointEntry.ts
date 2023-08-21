@@ -83,6 +83,22 @@ export class PointEntryResource extends Resource {
       team,
     });
   }
+
+  static graphqlType = `#graphql
+    type PointEntry {
+      entryId: ID!
+      type: TeamType!
+      comment: String!
+      points: Int!
+      personFrom: Person
+      team: Team!
+    }
+  `;
+
+  static graphqlQueries = `#graphql
+    pointEntry(entryId: ID!): PointEntry
+    pointEntries: [PointEntry!]!
+  `;
 }
 
 export interface PlainPointEntry

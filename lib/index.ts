@@ -13,10 +13,7 @@ export * from "./api/resource/Device.js";
 export * from "./api/resource/Event.js";
 export * from "./api/resource/Image.js";
 export * from "./api/resource/LoginFlowSession.js";
-export {
-  NotificationResource,
-  NotificationResourceInitializer,
-} from "./api/resource/Notification.js";
+export * from "./api/resource/Notification.js";
 export * from "./api/resource/Person.js";
 export * from "./api/resource/PointEntry.js";
 export * from "./api/resource/PointOpportunity.js";

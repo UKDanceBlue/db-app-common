@@ -110,6 +110,23 @@ export class ImageResource extends Resource {
       height: plain.height,
     });
   }
+
+  static graphqlType = `#graphql
+    type Image {
+      imageId: ID!
+      url: String
+      imageData: String
+      mimeType: String!
+      thumbHash: String
+      alt: String
+      width: Int!
+      height: Int!
+    }
+  `;
+
+  static graphqlQueries = `#graphql
+    image(imageId: ID!): Image
+  `;
 }
 
 export interface PlainImage

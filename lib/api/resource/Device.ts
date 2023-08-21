@@ -55,6 +55,20 @@ export class DeviceResource extends Resource {
       lastLogin: plain.lastLogin,
     });
   }
+
+  static graphqlType = `#graphql
+    type Device {
+      deviceId: ID!
+      expoPushToken: String
+      lastUser: Person
+      lastLogin: DateTime
+    }
+  `;
+
+  static graphqlQueries = `#graphql
+    device(deviceId: ID!): Device
+    devices: [Device!]!
+  `;
 }
 
 export interface DeviceResourceInitializer {

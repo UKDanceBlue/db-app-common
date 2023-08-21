@@ -5,8 +5,6 @@ import { isArrayOf } from "../../index.js";
 import type { ValidationError } from "../../util/resourceValidation.js";
 import { checkType, checkUnion } from "../../util/resourceValidation.js";
 
-import type { PlainPointEntry } from "./PointEntry.js";
-import { PointEntryResource } from "./PointEntry.js";
 import type { PlainResourceObject, ResourceStatic } from "./Resource.js";
 import { Resource } from "./Resource.js";
 import type { PlainRole } from "./Role.js";
@@ -33,8 +31,6 @@ export class PersonResource extends Resource {
 
   captainOf!: TeamResource[] | string[];
 
-  pointEntries!: PointEntryResource[] | string[];
-
   constructor({
     personId: userId,
     authIds,
@@ -45,7 +41,6 @@ export class PersonResource extends Resource {
     role,
     memberOf,
     captainOf,
-    pointEntries,
   }: PersonResourceInitializer) {
     super();
     this.personId = userId;
@@ -57,7 +52,6 @@ export class PersonResource extends Resource {
     this.role = role;
     this.memberOf = memberOf ?? [];
     this.captainOf = captainOf ?? [];
-    this.pointEntries = pointEntries ?? [];
   }
 
   toUserData(): UserData {
@@ -131,26 +125,6 @@ export class PersonResource extends Resource {
       errors,
       {}
     );
-    checkUnion(
-      [
-        {
-          type: "string",
-          options: {
-            isArray: true,
-          },
-        },
-        {
-          type: "Resource",
-          options: {
-            classToCheck: PointEntryResource,
-            isArray: true,
-          },
-        },
-      ],
-      this.pointEntries,
-      errors,
-      {}
-    );
     return errors;
   }
 
@@ -161,9 +135,6 @@ export class PersonResource extends Resource {
     const captainOf = isArrayOf(this.captainOf, "string")
       ? this.captainOf
       : this.captainOf.map((i) => i.toPlain());
-    const pointEntries = isArrayOf(this.pointEntries, "string")
-      ? this.pointEntries
-      : this.pointEntries.map((i) => i.toPlain());
     return {
       personId: this.personId,
       authIds: this.authIds,
@@ -174,7 +145,6 @@ export class PersonResource extends Resource {
       role: this.role.toPlain(),
       memberOf,
       captainOf,
-      pointEntries,
     };
   }
 
@@ -185,9 +155,6 @@ export class PersonResource extends Resource {
     const captainOf = isArrayOf(plain.captainOf, "string")
       ? plain.captainOf
       : plain.captainOf.map((i) => TeamResource.fromPlain(i));
-    const pointEntries = isArrayOf(plain.pointEntries, "string")
-      ? plain.pointEntries
-      : plain.pointEntries.map((i) => PointEntryResource.fromPlain(i));
     return new PersonResource({
       personId: plain.personId,
       authIds: plain.authIds,
@@ -198,9 +165,32 @@ export class PersonResource extends Resource {
       role: RoleResource.fromPlain(plain.role),
       memberOf,
       captainOf,
-      pointEntries,
     });
   }
+
+  static graphqlType = `#graphql
+    type AuthSource {
+      ${Object.values(AuthSource)
+        .map((source) => `${source}: String`)
+        .join("\n")}
+    }
+    type Person {
+      personId: ID!
+      authIds: AuthSource!
+      firstName: String
+      lastName: String
+      email: String!
+      linkblue: String
+      role: Role!
+      memberOf: [Team!]!
+      captainOf: [Team!]!
+    }
+  `;
+
+  static graphqlQueries = `#graphql
+    person(personId: ID!): Person
+    people: [Person!]!
+  `;
 }
 
 export interface PlainPerson
@@ -214,7 +204,6 @@ export interface PlainPerson
   role: PlainRole;
   memberOf: PlainTeam[] | string[];
   captainOf: PlainTeam[] | string[];
-  pointEntries: PlainPointEntry[] | string[];
 }
 
 export interface PersonResourceInitializer {
@@ -227,7 +216,6 @@ export interface PersonResourceInitializer {
   role: PersonResource["role"];
   memberOf?: PersonResource["memberOf"];
   captainOf?: PersonResource["captainOf"];
-  pointEntries?: PersonResource["pointEntries"];
 }
 
 PersonResource satisfies ResourceStatic<PersonResource, PlainPerson>;

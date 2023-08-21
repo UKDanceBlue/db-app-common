@@ -143,6 +143,24 @@ export class EventResource extends Resource {
       location: plain.location,
     });
   }
+
+  static graphqlType = `#graphql
+    type Event {
+      eventId: ID!
+      images: [Image]
+      occurrences: [DateTime!]!
+      duration: Duration
+      title: String!
+      summary: String
+      description: String
+      location: String
+    }
+  `;
+
+  static graphqlQueries = `#graphql
+    event(eventId: ID!): Event
+    events: [Event!]!
+  `;
 }
 
 export interface PlainEvent

@@ -28,6 +28,16 @@ export class NotificationResource extends Resource {
       notificationId: plain.notificationId,
     });
   }
+
+  static graphqlType = `#graphql
+    type Notification {
+      notificationId: ID!
+    }
+  `;
+
+  static graphqlQueries = `#graphql
+    notification(notificationId: ID!): Notification
+  `;
 }
 
 export interface PlainNotification

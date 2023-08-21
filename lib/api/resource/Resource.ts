@@ -70,7 +70,7 @@ export abstract class Resource {
    */
   public static deserialize<I, R extends Resource>(
     this: {
-      new (initializer: I): R;
+      new(initializer: I): R;
       fromPlain: ResourceStatic<R, PlainResourceObject<R>>["fromPlain"];
     },
     plain: PrimitiveObject
@@ -101,7 +101,7 @@ export abstract class Resource {
     R extends Resource
   >(
     this: {
-      new (initializer: I): R;
+      new(initializer: I): R;
       fromPlain: ResourceStatic<R, PlainResourceObject<R>>["fromPlain"];
     },
     plain: V[]
@@ -128,7 +128,7 @@ export type PlainResourceObject<I extends object> = {
       allow illegal values to be included.
       */
     Function
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   >]: unknown;
 };
 
@@ -136,9 +136,11 @@ export interface ResourceStatic<
   R extends Resource,
   P extends PlainResourceObject<R> = PlainResourceObject<R>
 > {
-  new (...args: never[]): R;
+  new(...args: never[]): R;
   fromPlain: (plain: P) => R;
   serializeArray: (instances: R[]) => PrimitiveObject[];
   deserialize: (plain: PrimitiveObject) => [R, ValidationError[]];
   deserializeArray: (plain: P[]) => [R[], ValidationError[]];
+  graphqlType: string;
+  graphqlQueries?: string;
 }

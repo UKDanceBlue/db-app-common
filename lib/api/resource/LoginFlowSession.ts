@@ -64,6 +64,18 @@ export class LoginFlowSessionResource extends Resource {
       redirectToAfterLogin: plain.redirectToAfterLogin,
     });
   }
+
+  static graphqlType = `#graphql
+    type LoginFlowSession {
+      sessionId: ID!
+      creationDate: DateTime!
+      redirectToAfterLogin: String
+    }
+  `;
+
+  static graphqlQueries = `#graphql
+    loginFlowSession(sessionId: ID!): LoginFlowSession
+  `;
 }
 
 export interface PlainLoginFlowSession

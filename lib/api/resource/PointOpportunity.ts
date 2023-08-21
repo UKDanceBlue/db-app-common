@@ -96,6 +96,22 @@ export class PointOpportunityResource extends Resource {
       team,
     });
   }
+
+  static graphqlType = `#graphql
+    type PointOpportunity {
+      entryId: ID!
+      type: TeamType!
+      name: String!
+      opportunityDate: String
+      personFrom: Person
+      team: Team!
+    }
+  `;
+
+  static graphqlQueries = `#graphql
+    pointOpportunity(entryId: ID!): PointOpportunity
+    pointOpportunities: [PointOpportunity!]!
+  `;
 }
 
 export interface PlainPointOpportunity

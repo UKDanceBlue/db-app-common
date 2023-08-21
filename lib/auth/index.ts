@@ -1,5 +1,5 @@
 export enum AuthSource {
-  UkyLinkblue = "uky-linkblue",
+  UkyLinkblue = "uky_linkblue",
   Anonymous = "anonymous",
 }
 
@@ -16,8 +16,8 @@ export enum AccessLevel {
 export enum DbRole {
   None = "none",
   Public = "public",
-  TeamMember = "team-member",
-  TeamCaptain = "team-captain",
+  TeamMember = "team_member",
+  TeamCaptain = "team_captain",
   Committee = "committee",
 }
 

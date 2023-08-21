@@ -158,6 +158,26 @@ export class TeamResource extends Resource {
       pointEntries,
     });
   }
+
+  static graphqlType = `#graphql
+    enum TeamType {
+      ${Object.values(TeamType).join("\n")}
+    }
+    type Team {
+      teamId: ID!
+      name: String!
+      type: String!
+      visibility: String!
+      members: [String!]!
+      captains: [String!]!
+      pointEntries: [String!]!
+    }
+  `;
+
+  static graphqlQueries = `#graphql
+    team(teamId: ID!): Team
+    teams: [Team!]!
+  `;
 }
 
 export interface PlainTeam

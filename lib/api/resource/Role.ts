@@ -44,6 +44,26 @@ export class RoleResource extends Resource {
       committee: plain.committee,
     });
   }
+
+  static graphqlType = `#graphql
+    enum DbRole {
+      none
+      public
+      team_member
+      team_captain
+      committee
+    }
+    enum CommitteeRole {
+      chair
+      coordinator
+      member
+    }
+    type Role {
+      dbRole: DbRole!
+      committeeRole: CommitteeRole
+      committee: String
+    }
+  `;
 }
 
 export interface PlainRole
