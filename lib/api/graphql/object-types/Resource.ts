@@ -1,4 +1,4 @@
-import type { ExcludeValues } from "../../util/TypeUtils.js";
+import type { ExcludeValues } from "../../../util/TypeUtils.js";
 
 export abstract class Resource {
   /**

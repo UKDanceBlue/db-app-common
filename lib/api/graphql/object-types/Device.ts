@@ -1,9 +1,10 @@
 import type { DateTime } from "luxon";
 import { Field, ID, ObjectType } from "type-graphql";
 
+import { DateTimeScalar } from "../custom-scalars/DateTimeScalar.js";
+
 import { PersonResource } from "./Person.js";
 import { Resource } from "./Resource.js";
-import { DateTimeScalar } from "./custom-scalars/DateTimeScalar.js";
 
 @ObjectType()
 export class DeviceResource extends Resource {

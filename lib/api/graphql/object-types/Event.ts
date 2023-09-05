@@ -3,8 +3,8 @@ import { Field, ID, ObjectType } from "type-graphql";
 
 import { ImageResource } from "./Image.js";
 import { Resource } from "./Resource.js";
-import { DateTimeScalar } from "./custom-scalars/DateTimeScalar.js";
-import { DurationScalar } from "./custom-scalars/DurationScalar.js";
+import { DateTimeScalar } from "../custom-scalars/DateTimeScalar.js";
+import { DurationScalar } from "../custom-scalars/DurationScalar.js";
 
 @ObjectType()
 export class EventResource extends Resource {

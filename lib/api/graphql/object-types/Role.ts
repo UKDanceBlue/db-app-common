@@ -1,6 +1,6 @@
 import { Field, ObjectType } from "type-graphql";
 
-import { CommitteeRole, DbRole } from "../../auth/index.js";
+import { CommitteeRole, DbRole } from "../../../auth/index.js";
 
 import { Resource } from "./Resource.js";
 

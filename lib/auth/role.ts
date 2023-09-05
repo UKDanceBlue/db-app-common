@@ -1,4 +1,4 @@
-import type { RoleResource } from "../api/graphql/Role.js";
+import type { RoleResource } from "../api/graphql/object-types/Role.js";
 
 import type { Authorization } from "./index.js";
 import { AccessLevel, CommitteeRole, DbRole } from "./index.js";

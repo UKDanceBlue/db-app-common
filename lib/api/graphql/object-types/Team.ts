@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType, registerEnumType } from "type-graphql";
 
-import { DbRole } from "../../index.js";
+import { DbRole } from "../../../index.js";
 
 import type { PersonResource } from "./Person.js";
 import type { PointEntryResource } from "./PointEntry.js";

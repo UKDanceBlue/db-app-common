@@ -1,7 +1,8 @@
 import { Field, ID, Int, ObjectType } from "type-graphql";
 
+import { UrlScalar } from "../custom-scalars/UrlScalar.js";
+
 import { Resource } from "./Resource.js";
-import { UrlScalar } from "./custom-scalars/UrlScalar.js";
 
 @ObjectType()
 export class ImageResource extends Resource {

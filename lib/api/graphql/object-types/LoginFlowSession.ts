@@ -1,9 +1,10 @@
 import { DateTime } from "luxon";
 import { Field, ID, ObjectType } from "type-graphql";
 
+import { DateTimeScalar } from "../custom-scalars/DateTimeScalar.js";
+import { UrlScalar } from "../custom-scalars/UrlScalar.js";
+
 import { Resource } from "./Resource.js";
-import { DateTimeScalar } from "./custom-scalars/DateTimeScalar.js";
-import { UrlScalar } from "./custom-scalars/UrlScalar.js";
 
 @ObjectType()
 export class LoginFlowSessionResource extends Resource {
