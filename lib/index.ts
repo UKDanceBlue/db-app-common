@@ -6,18 +6,18 @@ export * from "./api/request/SearchTypes.js";
 
 export * from "./api/response/JsonResponse.js";
 
-export * from "./api/resource/Resource.js";
-export * from "./api/resource/Configuration.js";
-export * from "./api/resource/Device.js";
-export * from "./api/resource/Event.js";
-export * from "./api/resource/Image.js";
-export * from "./api/resource/LoginFlowSession.js";
-export * from "./api/resource/Notification.js";
-export * from "./api/resource/Person.js";
-export * from "./api/resource/PointEntry.js";
-export * from "./api/resource/PointOpportunity.js";
-export * from "./api/resource/Role.js";
-export * from "./api/resource/Team.js";
+export * from "./api/graphql/Resource.js";
+export * from "./api/graphql/Configuration.js";
+export * from "./api/graphql/Device.js";
+export * from "./api/graphql/Event.js";
+export * from "./api/graphql/Image.js";
+export * from "./api/graphql/LoginFlowSession.js";
+export * from "./api/graphql/Notification.js";
+export * from "./api/graphql/Person.js";
+export * from "./api/graphql/PointEntry.js";
+export * from "./api/graphql/PointOpportunity.js";
+export * from "./api/graphql/Role.js";
+export * from "./api/graphql/Team.js";
 
 export * from "./auth/index.js";
 export * from "./auth/role.js";

@@ -20,5 +20,3 @@ export class PointOpportunityResource extends Resource {
   @Field(() => TeamResource)
   team!: TeamResource;
 }
-
-function test(t: ObjectType)
