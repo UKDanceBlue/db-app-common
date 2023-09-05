@@ -3,7 +3,6 @@ import "reflect-metadata";
 export * from "./api/request/BodyTypes.js";
 export * from "./api/request/ListQueryTypes.js";
 export * from "./api/request/SearchTypes.js";
-export * from "./api/request/Event.js";
 
 export * from "./api/response/JsonResponse.js";
 
@@ -29,9 +28,8 @@ export * from "./util/formData.js";
 export * from "./util/intervalTools.js";
 export * from "./util/TypeUtils.js";
 export * from "./util/typeTransformers.js";
-export * from "./util/resourceValidation.js";
+export * from "./util/validation.js";
 
-export { ApiClient } from "./client/ApiClient.js";
 
 export * from "./style/color.js";
 

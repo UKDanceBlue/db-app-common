@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { Field, ID, ObjectType } from "type-graphql";
+import { Field, ID, ObjectType, buildSchema } from "type-graphql";
 
 import { PersonResource } from "./Person.js";
 import { Resource } from "./Resource.js";
@@ -20,3 +20,5 @@ export class PointOpportunityResource extends Resource {
   @Field(() => TeamResource)
   team!: TeamResource;
 }
+
+function test(t: ObjectType)
