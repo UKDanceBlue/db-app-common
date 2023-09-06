@@ -12,4 +12,8 @@ export class RoleResource extends Resource {
   committeeRole!: CommitteeRole | null;
   @Field(() => String, { nullable: true })
   committee!: string | null;
+
+  public static init(init: Partial<RoleResource>) {
+    return RoleResource.doInit(init);
+  }
 }

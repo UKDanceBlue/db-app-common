@@ -16,4 +16,12 @@ export class DeviceResource extends Resource {
   public lastUser!: PersonResource | null;
   @Field(() => DateTimeScalar, { nullable: true })
   public lastLogin!: DateTime | null;
+
+  public getUniqueId(): string {
+    return this.deviceId;
+  }
+
+  public static init(init: Partial<DeviceResource>) {
+    return DeviceResource.doInit(init);
+  }
 }

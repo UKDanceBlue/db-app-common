@@ -29,4 +29,12 @@ export class ImageResource extends Resource {
 
   @Field(() => Int)
   height!: number;
+
+  public getUniqueId(): string {
+    return this.imageId;
+  }
+
+  public static init(init: Partial<ImageResource>) {
+    return ImageResource.doInit(init);
+  }
 }

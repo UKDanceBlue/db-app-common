@@ -1,10 +1,11 @@
 import type { DateTime, Duration } from "luxon";
 import { Field, ID, ObjectType } from "type-graphql";
 
-import { ImageResource } from "./Image.js";
-import { Resource } from "./Resource.js";
 import { DateTimeScalar } from "../custom-scalars/DateTimeScalar.js";
 import { DurationScalar } from "../custom-scalars/DurationScalar.js";
+
+import { ImageResource } from "./Image.js";
+import { Resource } from "./Resource.js";
 
 @ObjectType()
 export class EventResource extends Resource {
@@ -24,4 +25,12 @@ export class EventResource extends Resource {
   description!: string | null;
   @Field(() => String, { nullable: true })
   location!: string | null;
+
+  public getUniqueId(): string {
+    return this.eventId;
+  }
+
+  public static init(init: Partial<EventResource>) {
+    return EventResource.doInit(init);
+  }
 }

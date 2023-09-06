@@ -6,19 +6,6 @@ export * from "./api/request/SearchTypes.js";
 
 export * from "./api/response/JsonResponse.js";
 
-export * from "./api/graphql/object-types/Resource.js";
-export * from "./api/graphql/object-types/Configuration.js";
-export * from "./api/graphql/object-types/Device.js";
-export * from "./api/graphql/object-types/Event.js";
-export * from "./api/graphql/object-types/Image.js";
-export * from "./api/graphql/object-types/LoginFlowSession.js";
-export * from "./api/graphql/object-types/Notification.js";
-export * from "./api/graphql/object-types/Person.js";
-export * from "./api/graphql/object-types/PointEntry.js";
-export * from "./api/graphql/object-types/PointOpportunity.js";
-export * from "./api/graphql/object-types/Role.js";
-export * from "./api/graphql/object-types/Team.js";
-
 export * from "./auth/index.js";
 export * from "./auth/role.js";
 
@@ -30,6 +17,11 @@ export * from "./util/TypeUtils.js";
 export * from "./util/typeTransformers.js";
 export * from "./util/validation.js";
 
+export * as GraphQLResource from "./api/graphql/object-types/index.js";
+export * as GraphQLService from "./api/graphql/service-declarations/index.js";
+export * as GraphQLResolver from "./api/graphql/resolvers/index.js";
+
+export { TeamType } from "./api/graphql/object-types/Team.js";
 
 export * from "./style/color.js";
 

@@ -26,4 +26,12 @@ export class PersonResource extends Resource {
   memberOf!: TeamResource[] | string[];
   @Field(() => [TeamResource])
   captainOf!: TeamResource[] | string[];
+
+  public getUniqueId(): string {
+    return this.personId;
+  }
+
+  public static init(init: Partial<PersonResource>) {
+    return PersonResource.doInit(init);
+  }
 }

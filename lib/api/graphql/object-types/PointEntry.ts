@@ -19,4 +19,12 @@ export class PointEntryResource extends Resource {
   personFrom!: PersonResource | null;
   @Field(() => TeamResource)
   team!: TeamResource;
+
+  public getUniqueId(): string {
+    return this.entryId;
+  }
+
+  public static init(init: Partial<PointEntryResource>) {
+    return PointEntryResource.doInit(init);
+  }
 }

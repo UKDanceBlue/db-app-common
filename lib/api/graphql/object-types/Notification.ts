@@ -6,4 +6,12 @@ import { Resource } from "./Resource.js";
 export class NotificationResource extends Resource {
   @Field(() => ID)
   notificationId!: string;
+
+  public getUniqueId(): string {
+    return this.notificationId;
+  }
+
+  public static init(init: Partial<NotificationResource>) {
+    return NotificationResource.doInit(init);
+  }
 }

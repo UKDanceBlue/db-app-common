@@ -1,3 +1,5 @@
+import type { Class } from "utility-types";
+
 import type { ExcludeValues } from "../../../util/TypeUtils.js";
 
 export abstract class Resource {
@@ -13,6 +15,14 @@ export abstract class Resource {
   // eslint-disable-next-line class-methods-use-this
   public getUniqueId(): string {
     throw new Error(`Method not implemented by subclass.`);
+  }
+
+  protected static doInit<R extends object>(this: unknown, init: Partial<R>): R {
+    return Object.assign(new (this as Class<never>)() as R, init);
+  }
+
+  protected static init<R extends Resource>(init: R): Resource {
+    return Resource.doInit(init);
   }
 }
 

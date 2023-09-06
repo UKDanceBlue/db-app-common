@@ -16,4 +16,12 @@ export class LoginFlowSessionResource extends Resource {
   creationDate!: DateTime;
   @Field(() => UrlScalar, { nullable: true })
   redirectToAfterLogin!: URL | null;
+
+  public getUniqueId(): string {
+    return this.sessionId;
+  }
+
+  public static init(init: Partial<LoginFlowSessionResource>) {
+    return LoginFlowSessionResource.doInit(init);
+  }
 }

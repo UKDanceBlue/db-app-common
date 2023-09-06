@@ -33,4 +33,12 @@ export class TeamResource extends Resource {
   captains!: (PersonResource | string)[];
   @Field(() => [String])
   pointEntries!: (PointEntryResource | string)[];
+
+  public getUniqueId(): string {
+    return this.teamId;
+  }
+
+  public static init(init: Partial<TeamResource>) {
+    return TeamResource.doInit(init);
+  }
 }
