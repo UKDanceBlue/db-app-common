@@ -1,5 +1,5 @@
-import type { PrimitiveObject } from "../../util/TypeUtils.js";
-import { isPrimitiveObject } from "../../util/TypeUtils.js";
+import type { Primitive, PrimitiveObject } from "../../index.js";
+import { isPrimitive, isPrimitiveObject } from "../../index.js";
 
 export enum ClientAction {
   LOGOUT = "logout",
@@ -18,9 +18,7 @@ export interface BaseResponse {
   clientActions?: ClientAction[];
 }
 
-export interface OkApiResponse<
-  DataType extends PrimitiveObject | PrimitiveObject[] = PrimitiveObject
-> extends BaseResponse {
+export interface OkApiResponse<DataType> extends BaseResponse {
   ok: true;
   /**
    * The payload of the response (can be pretty much anything)
@@ -28,37 +26,39 @@ export interface OkApiResponse<
   data?: DataType;
 }
 
-export function isSingularOkApiResponse<
-  DataType extends PrimitiveObject = PrimitiveObject
->(response: unknown): response is OkApiResponse<DataType> {
+export function isSingularOkApiResponse(
+  response: unknown
+): response is OkApiResponse<Primitive | PrimitiveObject> {
   return (
     typeof response === "object" &&
     response !== null &&
     "ok" in response &&
     response.ok === true &&
-    ("data" in response && response.data !== undefined
-      ? isPrimitiveObject(response.data)
+    ("data" in response
+      ? (
+        (isPrimitive(response.data) || isPrimitiveObject(response.data)) &&
+        !Array.isArray(response.data)
+      )
       : true)
   );
 }
 
-export function isArrayOkApiResponse<
-  DataType extends PrimitiveObject[] = PrimitiveObject[]
->(response: unknown): response is OkApiResponse<DataType> {
+export function isArrayOkApiResponse<DataType = unknown>(
+  response: unknown
+): response is OkApiResponse<DataType[]> {
   return (
     typeof response === "object" &&
     response !== null &&
     "ok" in response &&
     response.ok === true &&
     "data" in response &&
-    Array.isArray(response.data) &&
-    response.data.every(isPrimitiveObject)
+    Array.isArray(response.data)
   );
 }
 
-export function isOkApiResponse<
-  DataType extends PrimitiveObject | PrimitiveObject[] = PrimitiveObject
->(response: unknown): response is OkApiResponse<DataType> {
+export function isOkApiResponse<DataType = unknown>(
+  response: unknown
+): response is OkApiResponse<DataType> {
   return isSingularOkApiResponse(response) || isArrayOkApiResponse(response);
 }
 
@@ -69,9 +69,7 @@ export function isOkApiResponse<
  * @param opts.value The response data
  * @return The OK API response
  */
-export function okResponseFrom<
-  DataType extends PrimitiveObject | PrimitiveObject[] = PrimitiveObject
->({
+export function okResponseFrom<DataType>({
   value = undefined,
 }: {
   value?: DataType;
@@ -85,18 +83,16 @@ export function okResponseFrom<
   return response;
 }
 
-export interface CreatedApiResponse<
-  DataType extends PrimitiveObject = PrimitiveObject
-> extends OkApiResponse<DataType> {
+export interface CreatedApiResponse<DataType> extends OkApiResponse<DataType> {
   /**
    * The ID of the created resource (this is the UUID not the sequential ID)
    */
   id: string;
 }
 
-export function isCreatedApiResponse<
-  DataType extends PrimitiveObject = PrimitiveObject
->(response: unknown): response is CreatedApiResponse<DataType> {
+export function isCreatedApiResponse<DataType = unknown>(
+  response: unknown
+): response is CreatedApiResponse<DataType> {
   return (
     typeof response === "object" &&
     response !== null &&
@@ -117,9 +113,7 @@ export function isCreatedApiResponse<
  * @param opts.id The ID of the created resource
  * @return The created API response
  */
-export function createdResponseFrom<
-  DataType extends PrimitiveObject = PrimitiveObject
->({
+export function createdResponseFrom<DataType>({
   value,
   id,
 }: {
@@ -164,18 +158,17 @@ export function isPaginationInfo(
   );
 }
 
-export interface PaginatedApiResponse<
-  DataType extends PrimitiveObject = PrimitiveObject
-> extends OkApiResponse<DataType[]> {
+export interface PaginatedApiResponse<DataType>
+  extends OkApiResponse<DataType[]> {
   /**
    * The pagination settings the server used to generate the response
    */
   pagination: PaginationInfo;
 }
 
-export function isPaginatedApiResponse(
+export function isPaginatedApiResponse<DataType = unknown>(
   response: unknown
-): response is PaginatedApiResponse {
+): response is PaginatedApiResponse<DataType> {
   return (
     typeof response === "object" &&
     response !== null &&
@@ -188,9 +181,7 @@ export function isPaginatedApiResponse(
   );
 }
 
-export function paginatedResponseFrom<
-  DataType extends PrimitiveObject = PrimitiveObject
->({
+export function paginatedResponseFrom<DataType>({
   value,
   pagination,
 }: {
@@ -226,6 +217,29 @@ export interface ApiError<HasCause extends boolean = boolean> {
    * errors can be used to address the issue.
    */
   errorCause?: HasCause extends true ? unknown : never;
+}
+
+export function isApiError(error: unknown): error is ApiError {
+  if (
+    typeof error !== "object" ||
+    error === null ||
+    !("errorMessage" in error) ||
+    typeof error.errorMessage !== "string"
+  ) {
+    return false;
+  } else if (
+    "errorDetails" in error &&
+    typeof error.errorDetails !== "string"
+  ) {
+    return false;
+  } else if (
+    "errorExplanation" in error &&
+    typeof error.errorExplanation !== "string"
+  ) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 export interface ErrorApiResponse extends BaseResponse, ApiError {
@@ -285,12 +299,12 @@ export function errorResponseFrom({
   return response;
 }
 
-export type ApiResponse<DataType extends PrimitiveObject = PrimitiveObject> =
+export type ApiResponse<DataType> =
   | OkApiResponse<DataType | DataType[]>
   | CreatedApiResponse<DataType>
   | PaginatedApiResponse<DataType>
   | ErrorApiResponse;
 
-export function isApiResponse(response: unknown): response is ApiResponse {
+export function isApiResponse(response: unknown): response is ApiResponse<unknown> {
   return isOkApiResponse(response) || isErrorApiResponse(response);
 }
