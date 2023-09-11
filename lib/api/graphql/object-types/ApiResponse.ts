@@ -82,12 +82,12 @@ export function defineGraphQLArrayOkResponse<T extends object>(name: string, typ
 
 @ObjectType({ description: "API response" })
 export abstract class AbstractGraphQLCreatedResponse<T> extends AbstractGraphQLOkResponse<T> implements CreatedApiResponse<T> {
-  id!: string;
+  uuid!: string;
 
   toJson(): CreatedApiResponse<T> {
     const baseResponse: CreatedApiResponse<T> = {
       ok: this.ok,
-      id: this.id,
+      uuid: this.uuid,
     };
     if (this.clientActions != null) baseResponse.clientActions = this.clientActions;
     if (this.data != null) baseResponse.data = this.data;
@@ -100,8 +100,8 @@ export function defineGraphQlCreatedResponse<T extends object>(name: string, typ
   class GraphQLCreatedResponse extends AbstractGraphQLCreatedResponse<T> {
     ok!: true;
 
-    @Field(() => String, { description: "The ID of the created resource" })
-    id!: string;
+    @Field(() => String, { description: "The UUID of the created resource" })
+    uuid!: string;
 
     @Field(() => type, { nullable: true, description: "The payload of the response" })
     data?: T;

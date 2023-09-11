@@ -3,8 +3,8 @@ import { Arg, Field, InputType, Mutation, Query, Resolver } from "type-graphql";
 import type { AbstractGraphQLArrayOkResponse } from "../object-types/ApiResponse.js";
 import { GraphQLErrorResponse, defineGraphQLArrayOkResponse, defineGraphQlCreatedResponse, defineGraphQlOkResponse, withGraphQLErrorUnion } from "../object-types/ApiResponse.js";
 import { ConfigurationResource } from "../object-types/Configuration.js";
-import type { ConfigurationServiceInterface } from "../service-declarations/ConfigurationService.js";
-import { configurationServiceToken } from "../service-declarations/ConfigurationService.js";
+import type { ConfigurationServiceInterface } from "../service-declarations/ConfigurationServiceInterface.js";
+import { configurationServiceToken } from "../service-declarations/ConfigurationServiceInterface.js";
 
 import { createBaseResolver } from "./BaseResolver.js";
 
@@ -40,12 +40,12 @@ export class ConfigurationResolver extends ConfigurationResourceBaseResolver {
   @Mutation(() => withGraphQLErrorUnion(CreateConfigurationResponse), { name: "createConfiguration" })
   async create(@Arg("input") input: CreateConfigurationInput): Promise<AbstractGraphQLArrayOkResponse<ConfigurationResource> | GraphQLErrorResponse> {
     const result = await this.service.create(input);
-    if (!("id" in result)) {
+    if (!("uuid" in result)) {
       return GraphQLErrorResponse.from(result);
     }
 
     const response = CreateConfigurationResponse.newOk(result);
-    response.id = result.id;
+    response.uuid = result.uuid;
     return response;
   }
 

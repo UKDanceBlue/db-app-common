@@ -85,9 +85,9 @@ export function okResponseFrom<DataType>({
 
 export interface CreatedApiResponse<DataType> extends OkApiResponse<DataType> {
   /**
-   * The ID of the created resource (this is the UUID not the sequential ID)
+   * The UUID of the created resource (this is the UUID not the sequential UUID)
    */
-  id: string;
+  uuid: string;
 }
 
 export function isCreatedApiResponse<DataType = unknown>(
@@ -98,33 +98,33 @@ export function isCreatedApiResponse<DataType = unknown>(
     response !== null &&
     "ok" in response &&
     response.ok === true &&
-    "id" in response &&
-    typeof response.id === "string"
+    "uuid" in response &&
+    typeof response.uuid === "string"
   );
 }
 
 /**
  * Creates a "created" API response indicating that a resource was successfully created.
- * The response will have an `id` property that refers to the UUID of the created resource.
+ * The response will have an `uuid` property that refers to the UUID of the created resource.
  * It may also have a `data` property if the resource was returned in the response.
  *
  * @param opts The options
  * @param opts.value The response data
- * @param opts.id The ID of the created resource
+ * @param opts.uuid The UUID of the created resource
  * @return The created API response
  */
 export function createdResponseFrom<DataType>({
   value,
-  id,
+  uuid,
 }: {
   value?: DataType;
-  id: string;
+  uuid: string;
 }): CreatedApiResponse<DataType> {
   const okResponse: OkApiResponse<DataType> =
     value !== undefined ? okResponseFrom({ value }) : okResponseFrom();
   return {
     ...okResponse,
-    id,
+    uuid,
   };
 }
 

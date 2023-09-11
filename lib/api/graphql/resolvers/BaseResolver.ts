@@ -23,7 +23,7 @@ export function createBaseResolver<T extends Resource, S extends ServiceInterfac
 
     @Query(() => withGraphQLErrorUnion(ResourceByIdResponse), { name: `get${resourceName}ById`, nullable: true })
     async getById(@Arg("id") id: string): Promise<AbstractGraphQLOkResponse<T | null> | GraphQLErrorResponse> {
-      const result = await this.service.getById(id);
+      const result = await this.service.getByUuid(id);
       if (isApiError(result)) {
         return GraphQLErrorResponse.from(result);
       }
