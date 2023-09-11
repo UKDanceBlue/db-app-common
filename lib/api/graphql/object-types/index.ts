@@ -1,4 +1,4 @@
-export { PlainResourceObject, Resource } from "./Resource.js"
+export { Resource } from "./Resource.js"
 export { ConfigurationResource } from "./Configuration.js"
 export { DeviceResource } from "./Device.js"
 export { EventResource } from "./Event.js"

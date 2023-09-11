@@ -17,26 +17,14 @@ export abstract class Resource {
     throw new Error(`Method not implemented by subclass.`);
   }
 
-  protected static doInit<R extends object>(this: unknown, init: Partial<R>): R {
-    return Object.assign(new (this as Class<never>)() as R, init);
+  protected static doInit<R extends object>(this: Class<R>, init: Partial<R>): R {
+    const instance = new this();
+    Object.assign(instance, init);
+    return instance;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected static init<R extends Resource>(init: R): Resource {
-    return Resource.doInit(init);
+    throw new Error(`Method not implemented by subclass.`);
   }
 }
-
-// TODO: there is something funky here, autocomplete is broken and that probably means
-// that the type is wrong somehow
-export type PlainResourceObject<I extends object> = {
-  [key in keyof ExcludeValues<
-    I,
-    /*
-      eslint-disable-next-line @typescript-eslint/ban-types -- We don't care about the lack
-      of safety here because we are excluding the values, in fact the added specificity would
-      allow illegal values to be included.
-      */
-    Function
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  >]: unknown;
-};
